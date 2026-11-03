@@ -107,4 +107,6 @@ npm.cmd run build
 
 `scripts/verify.py` 提供核心、数值和完整案例三个有超时限制的验证层；`.github/workflows/verify.yml` 配置 Windows 自动验证。`scripts/verify-ui.py` 启动独立服务做浏览器测试。构建前运行 `scripts/build-info.py`，发行目录含源码提交与依赖摘要；发布前运行 `scripts/release-check.py`。详见 [稳定版验收](ACCEPTANCE.md)。
 
+齿轮性能使用 `python scripts/benchmark-gear.py` 单独测量；它保存相同网格的求解状态，随后可用 `--resume --output work/gear-benchmark/repeat` 重测后处理。状态是本机生成的 pickle，只能读取可信的本地文件，不能把下载的 notebook 或任意外部文件作为 `--state`。基准默认使用与桌面一致的 8 核亲和性，保留壁钟与 CPU 时间、网格规模、原生执行记录和输出；JSON 导出不计入计算时间。`--profile` 会产生额外开销，不作为速度比较。不要在编译或其它基准运行期间计时。
+
 构建中断时先看具体错误；[Windows 打包补充](BUILD-NOTES.md) 记录了本机曾遇到的 NSIS 缓存问题，不是普遍安装前提。公开发布另见 [发行准备](RELEASING.md)。

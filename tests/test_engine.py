@@ -119,7 +119,10 @@ def test_shipped_examples():
     import os
     import time
     from pathlib import Path
-    kernel.configure_threads(int(os.environ.get('CALIX_MAX_WORKERS', '8')))
+    from backend.hardware import limit_process_cores
+    workers = int(os.environ.get('CALIX_MAX_WORKERS', '8'))
+    kernel.configure_threads(workers)
+    print(f'Functional regression, not a performance benchmark; affinity: {limit_process_cores(workers)}', flush=True)
     for path in (Path(__file__).resolve().parents[1] / "examples").glob("*.calix"):
         print(f'Example: {path.name}', flush=True)
         engine = Engine()
