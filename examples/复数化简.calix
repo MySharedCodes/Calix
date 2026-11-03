@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "复数化简",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nSimplify[ComplexExpand[(x+I*y)/(x-I*y)+(x-I*y)/(x+I*y)]]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nFactor[ComplexExpand[Conjugate[(x+I*y)^3]*(x+I*y)^3]]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nSimplify[ComplexExpand[Exp[I*x]*(Cos[x]-I*Sin[x])]]"
+    }
+  ]
+}

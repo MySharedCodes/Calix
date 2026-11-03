@@ -1,0 +1,27 @@
+{
+  "title": "高考数学：2008 江西理科第22题",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# 高考数学：2008 江西理科第22题\n\n设 $a>0,x>0$，$f(x)=1/\\sqrt{1+x}+1/\\sqrt{1+a}+\\sqrt{ax/(ax+8)}$。\n\n当 $a=8$ 时求单调区间；求全部正参数范围内 $f(x)$ 的精确下确界与上确界。\n\n## 固定参数时的单调性\n\nIn[1] 取 $a=8$，依次输出导函数、正半轴上的驻点、递增区间、递减区间、驻点处函数值，以及函数图像。",
+      "id": "case-7-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[a,x,p,q,u,v,g₁,p₉];\nf=1/Sqrt[1+x]+1/Sqrt[1+a]+Sqrt[a*x/(a*x+8)];\nf₈=ReplaceAll[f,a->8];\nc₉=SolveValues[D[f₈,x]==0,x];\nColumn[{\n  Labeled[Simplify[D[f₈,x]], \"f₈ derivative\"],\n  Labeled[c₉, \"stationary x values\"],\n  Labeled[Reduce[{D[f₈,x]>0,x>0},x,Reals], \"increasing region\"],\n  Labeled[Reduce[{D[f₈,x]<0,x>0},x,Reals], \"decreasing region\"],\n  Labeled[Table[Simplify[ReplaceAll[f₈,x->p]],{p,c₉}], \"stationary function values\"],\n  Labeled[Plot[f₈,{x,1/100,8}], \"f₈ versus x\"]\n}]",
+      "id": "case-7-1"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 全局解析上下界\n\n输出依次为精确下确界与上确界、严格界的四项代数检验。检验依次覆盖下界、上界、根式项为正、根式项小于一；每项分别检查分子和分母的系数，全部为 True 表示严格界成立。最后绘制正参数区域的函数曲面。",
+      "id": "case-7-2"
+    },
+    {
+      "mode": "source",
+      "code": "b₅=Sort[{Limit[ReplaceAll[f,a->x],x->0],Limit[ReplaceAll[f,a->x],x->Infinity]}];\ns₁₂=Factor[Together[ReplaceAll[(f-1/Sqrt[1+x]-1/Sqrt[1+a])^2,{x->1/u^2-1,a->1/v^2-1}]]];\ng₂={\n  Together[ReplaceAll[s₁₂-(First[b₅]-u-v)^2,{u->p/(1+p+q),v->q/(1+p+q)}]],\n  Together[ReplaceAll[(Last[b₅]-u-v)^2-s₁₂,{u->1-p/(1+p+q),v->1-q/(1+p+q)}]],\n  Together[ReplaceAll[s₁₂,{u->p/(1+p),v->q/(1+q)}]],\n  Together[ReplaceAll[1-s₁₂,{u->p/(1+p),v->q/(1+q)}]]\n};\nc₃=Table[Table[\n  Min[Flatten[CoefficientList[p₉,{p,q}]]]>=0&&Max[Flatten[CoefficientList[p₉,{p,q}]]]>0,\n  {p₉,{Numerator[g₁],Denominator[g₁]}}],{g₁,g₂}];\nColumn[{\n  Labeled[b₅, \"{infimum, supremum}\"],\n  Labeled[c₃, \"strict-bound positivity checks\"],\n  Labeled[Plot3D[ReplaceAll[f,{a->Exp[p],x->Exp[q]}],{p,-8,8},{q,-8,8}], \"f versus log(a), log(x)\"]\n}]",
+      "id": "case-7-3"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

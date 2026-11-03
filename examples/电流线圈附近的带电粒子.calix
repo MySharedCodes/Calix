@@ -1,0 +1,57 @@
+{
+  "title": "电流线圈附近的带电粒子",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# 电流线圈附近的带电粒子\n\n三个同轴细圆线圈半径均为 $R=0.1$ m，中心位于 $z/R=-0.7,0,0.7$，电流均为 $I=1000$ A，从 $+z$ 看为逆时针。六个质点质量相同，前三个带 $+e$、后三个带 $-e$ 电荷；质量均取质子质量。不计质点间相互作用、重力、辐射及对线圈的反作用。真空磁导率取 $4\\pi\\times10^{-7}$ H/m。\n\n以线圈半径为长度单位、三线圈在原点的合磁场 $B_0$ 为磁场单位、$m_p/(eB_0)$ 为时间单位。六个不同的初始位置与速度在计算单元的 s₁₃、v₄ 中列出；各行与编号一一对应。计算至无量纲时间 20。理想导线不属于粒子可通过的区域。\n\n## 轴线磁场\n\n依次输出轴线磁场、中心磁场、时间单位和速度单位。",
+      "id": "case-13-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[z,φ,x,y,t,i,j,h,r₁₂,s₂];\nc₆={-0.7,0,0.7};\nn₄=Total[Table[1/(1+h^2)^(3/2),{h,c₆}]];\na₁₀=Total[Table[1/(1+(z-h)^2)^(3/2),{h,c₆}]]/n₄;\nr₇=0.1[m]; j₀=1000[A]; μ=4*Pi*1e-7[H/m];\nc₄=1.602176634e-19[C]; m=1.67262192369e-27[kg];\nc₂=μ*j₀/(2*r₇)*n₄;\nτ₀=m/(c₄*c₂);\nColumn[{\n  Labeled[a₁₀, \"axial magnetic field, Bz(z) / B0\"],\n  Labeled[N[UnitConvert[c₂,\"mT\"],12], \"central magnetic field B0\"],\n  Labeled[N[UnitConvert[τ₀,\"us\"],12], \"time scale, mp / (e B0)\"],\n  Labeled[N[UnitConvert[r₇/τ₀,\"km/s\"],12], \"velocity scale, R / time scale\"]\n}]",
+      "id": "case-13-1"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 中心均匀场近似的解析运动\n\n此处将磁场固定为中心值；解析轨迹用来对照后面的非均匀磁场计算。",
+      "id": "case-13-2"
+    },
+    {
+      "mode": "source",
+      "code": "u₅=DSolveValue[{\n  x''[t]==y'[t],y''[t]==-x'[t],z''[t]==0,\n  x[0]==11/50,y[0]==0,z[0]==1/10,x'[0]==0,y'[0]==4/25,z'[0]==2/25\n},{x[t],y[t],z[t]},t];\nColumn[{\n  Labeled[Part[u₅,1],\"uniform field, x(t)\"],\n  Labeled[Part[u₅,2],\"uniform field, y(t)\"],\n  Labeled[Part[u₅,3],\"uniform field, z(t)\"]\n}]",
+      "id": "case-13-3"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 非均匀磁场中的运动\n\n每个圆线圈的磁场采用完全椭圆积分解析式，EllipticK 和 EllipticE 的自变量为参数 m。将三个平移后的磁场相加，分别求解六个质点的洛伦兹运动方程。",
+      "id": "case-13-4"
+    },
+    {
+      "mode": "source",
+      "code": "ρ=Sqrt[x^2+y^2];\nd₃=Sqrt[(1+ρ)^2+z^2]; δ=(1-ρ)^2+z^2;\np₄=4*ρ/d₃^2;\nr₄=z/(Pi*ρ*d₃)*(-EllipticK[p₄]+(1+ρ^2+z^2)/δ*EllipticE[p₄]);\na₉=1/(Pi*d₃)*(EllipticK[p₄]+(1-ρ^2-z^2)/δ*EllipticE[p₄]);\ns₄={r₄*x/ρ,r₄*y/ρ,a₉};\nc₈=Table[ReplaceAll[s₄,z->z-h],{h,c₆}];\nB₁=Table[Total[Table[Part[r₁₂,j],{r₁₂,c₈}]]/n₄,{j,1,3}];\nr₁₃={x->x[t],y->y[t],z->z[t]};\nm₁=ReplaceAll[B₁,r₁₃];\ns₃={1,1,1,-1,-1,-1};\ns₁₃={{0.22,0,0.1},{-0.28,0.12,-0.15},{0.15,-0.3,0.25},{-0.22,-0.1,0.12},{0.3,0.18,-0.2},{-0.12,0.32,0.28}};\nv₄={{0,0.16,0.08},{0.14,0.04,0.07},{-0.12,0.1,-0.08},{0.08,-0.14,0.06},{-0.1,0.12,-0.07},{0.15,-0.06,-0.09}};\nm₂=Table[NDSolveValue[{\n  x''[t]==Part[s₃,k]*(y'[t]*Part[m₁,3]-z'[t]*Part[m₁,2]),\n  y''[t]==Part[s₃,k]*(z'[t]*Part[m₁,1]-x'[t]*Part[m₁,3]),\n  z''[t]==Part[s₃,k]*(x'[t]*Part[m₁,2]-y'[t]*Part[m₁,1]),\n  x[0]==Part[s₁₃,k,1],y[0]==Part[s₁₃,k,2],z[0]==Part[s₁₃,k,3],\n  x'[0]==Part[v₄,k,1],y'[0]==Part[v₄,k,2],z'[0]==Part[v₄,k,3]\n},{x[t],y[t],z[t]},{t,0,20}],{k,1,6}];\nLabeled[m₂,\"six particles, position functions {x,y,z}/R\"]",
+      "id": "case-13-5"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 磁场与轨迹\n\n铜色圆环为三个线圈，浅灰青色细线为合磁场的磁感线；磁感线由 d r/ds=B/|B| 数值积分得到。六条彩色粗线对应六个质点。两张过轴半透明切片以颜色表示 |B|/B₀，采用 log(1+|B|/B₀) 色标，超过色标上限的强场按上限显示。理想导线周围 0.075R 的区域不作场强显示。",
+      "id": "case-13-6"
+    },
+    {
+      "mode": "source",
+      "code": "Labeled[MagneticFieldPlot3D[B₁,{x,y,z},c₆,m₂,s₃,{t,0,20}],\"three coils, dense field lines and six charged particles; coordinates / R\"]",
+      "id": "case-13-7"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 高度与能量\n\n磁力不做功。均匀场近似对应第1个粒子的初始条件；高度图同时显示六个粒子。再分别检查六条数值轨迹的速度平方漂移。",
+      "id": "case-13-8"
+    },
+    {
+      "mode": "source",
+      "code": "h₀=Table[Part[m₂,k,3],{k,1,6}];\ns₁₁=Table[Total[Table[D[Part[m₂,k,i],t]^2,{i,1,3}]],{k,1,6}];\ns₁₀=Table[Part[s₁₁,k]-ReplaceAll[Part[s₁₁,k],t->0],{k,1,6}];\nColumn[{\n  Labeled[Plot[Join[{Part[u₅,3]},h₀],{t,0,20},PlotLegends->{\"uniform, 1\",\"1,+e\",\"2,+e\",\"3,+e\",\"4,-e\",\"5,-e\",\"6,-e\"}],\"height, z/R\"],\n  Labeled[Plot[s₁₀,{t,0,20},PlotLegends->{\"1,+e\",\"2,+e\",\"3,+e\",\"4,-e\",\"5,-e\",\"6,-e\"}],\"speed squared drift, six particles\"]\n}]",
+      "id": "case-13-9"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

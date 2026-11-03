@@ -1,0 +1,17 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "解析最值",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nMinimize[x^2-4 x+5,x]\nMaximize[4-x^2,{x,-3,3}]\nPlot[{x^2-4 x+5,4-x^2},{x,-3,4}]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nMinimize[x^4-2 x^2,{x,-2,2}]\nMaximize[x (4-x),{x,0,4}]\nPlot[x^4-2 x^2,{x,-2,2}]"
+    }
+  ]
+}

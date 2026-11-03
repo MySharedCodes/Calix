@@ -1,0 +1,37 @@
+{
+  "title": "格点色动力学：SU(3) 规范场与 Wilson 环",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# 格点色动力学：SU(3) 规范场与 Wilson 环\n\n在 $4^4$ 的欧氏周期格点上计算 SU(3) 纯规范场。链变量 $U_\\mu(x)$ 是 $3\\times3$ 的特殊酉矩阵，采用 Wilson 作用量：\n\n\n$$\nS[U]=\\beta\\sum_{x,\\mu<\\nu}\\left(1-\\frac13\\operatorname{Re}\\operatorname{Tr}U_{\\mu\\nu}(x)\\right),\\qquad \\beta=\\frac6{g^2}.\n$$\n\n\n\n$$\nU_{\\mu\\nu}(x)=U_\\mu(x)U_\\nu(x+\\hat\\mu)U_\\mu^\\dagger(x+\\hat\\nu)U_\\nu^\\dagger(x).\n$$\n\n\n取 $\\beta=5.7$，从单位链变量开始。每个 sweep 遍历全部链，对 SU(3) 的三个嵌入 SU(2) 子群分别提出对称随机转动，并以 $\\min(1,e^{-\\Delta S})$ 接受。先做 200 个热化 sweep，再每隔 5 个 sweep 测量一次，共取 120 个样本。\n\n本例不包含动力学夸克，用于计算纯胶子规范场的 Wilson 环。格点体积和样本数较小，未设定物理格距，不从这些数据提取强子质量。\n\n## 生成规范场样本\n\nLatticeGaugeSimulation 是 Calix 的原生计算扩展，更新循环和观测量计算在 C++ 中执行。随机种子固定后可重复运行。",
+      "id": "case-22-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[a,b,c,d,h,i,j,k,n,p,r,s,u,β];\nβ=5.7;n=4;\nu=LatticeGaugeSimulation[{n,n,n,n},Association[\n \"Beta\"->β,\"ThermalizationSweeps\"->200,\"Measurements\"->120,\n \"SweepsBetweenMeasurements\"->5,\"ProposalSize\"->0.3,\"RandomSeed\"->20261030]];\nh=u[\"History\"];d=u[\"Measurements\"];\nLabeled[{n^4,4*n^4,Length[d]},\"sites, SU(3) links and measurements\"]\nLabeled[u[\"Diagnostics\"],\"max {unitarity error, determinant error, gauge-invariance error}\"]",
+      "id": "case-22-1"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 热化与接受率\n\n平均 plaquette 为所有基本方格 $\\operatorname{Re}\\operatorname{Tr}U_{\\mu\\nu}/3$ 的平均值。下面保留完整 sweep 历史；前 200 步属于热化区，不进入统计。接受率是该 sweep 中通过 Metropolis 检验的子群更新比例。热化是否充分，还应比较不同起始场和更长运行。",
+      "id": "case-22-2"
+    },
+    {
+      "mode": "source",
+      "code": "Labeled[ListLinePlot[Table[{Part[h,i,1],Part[h,i,2]},{i,1,Length[h]}]],\"average plaquette versus sweep\"]\nLabeled[ListLinePlot[Table[{Part[h,i,1],Part[h,i,3]},{i,1,Length[h]}]],\"Metropolis acceptance versus sweep\"]",
+      "id": "case-22-3"
+    },
+    {
+      "mode": "markdown",
+      "code": "## Wilson 环与分块误差\n\n\n$$\nW(R,T)=\\left\\langle\\frac13\\operatorname{Re}\\operatorname{Tr}\\prod_{\\ell\\in C_{R,T}}U_\\ell\\right\\rangle.\n$$\n\n\n每次测量对全部格点和六个坐标平面平均；非正方形还平均两种方向。数据四列依次为 $W(1,1),W(1,2),W(2,2)$ 和时间方向 Polyakov 环实部。Polyakov 环为同一空间位置上绕周期时间方向一周的链矩阵乘积迹。\n\n将 120 个样本分成 12 块，先求各块平均，再由块均值估计标准误差。样本有自相关，块长不足时误差仍会偏小；可增加采样间隔、样本数和块长，观察误差的稳定性。",
+      "id": "case-22-4"
+    },
+    {
+      "mode": "source",
+      "code": "b=10;\nr=Table[s=Table[Mean[Table[Part[d,(i-1)*b+j,k],{j,1,b}]],{i,1,Length[d]/b}];\n {Mean[s],StandardDeviation[s]/Sqrt[Length[s]]},{k,1,4}];\nLabeled[r,\"{mean, blocked standard error}: W11, W12, W22, Re Polyakov\"]\nLabeled[ListLinePlot[Table[Table[{i,Part[d,i,k]},{i,1,Length[d]}],{k,1,3}],PlotLegends->{\"W(1,1)\",\"W(1,2)\",\"W(2,2)\"}],\"Wilson loop measurement history\"]\nLabeled[Histogram[Table[Part[d,i,1],{i,1,Length[d]}]],\"plaquette sample distribution\"]",
+      "id": "case-22-5"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

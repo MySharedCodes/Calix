@@ -1,0 +1,48 @@
+const { chromium } = require(process.env.CALIX_PLAYWRIGHT || 'C:/Users/Numerical_Magic_Box/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+(async () => {
+  fs.mkdirSync('work/ui', { recursive: true });
+  assert.equal(fs.readdirSync('docs/branding/Calix-logos-100').filter(x => x.endsWith('.svg')).length, 100);
+  const browser = await chromium.launch({ headless: true, channel: 'msedge' });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  const url = 'file:///D:/Calix/docs/branding/Calix-logos-100/index.html';
+  await page.goto(url);
+  assert.equal(await page.locator('.concept').count(), 100);
+  await page.locator('[data-id="130"] .mark-button').click();
+  assert.match(await page.locator('#selected-name').innerText(), /^130/);
+  assert.equal(await page.locator('#download').getAttribute('href'), 'Calix-130.svg');
+  await page.selectOption('#family', '线性代数');
+  assert.equal(await page.locator('.concept').count(), 10);
+  await page.selectOption('#family', '');
+  await page.fill('#search', '068');
+  assert.equal(await page.locator('.concept').count(), 1);
+  await page.fill('#search', '');
+  for (const id of ['031', '068', '130']) await page.locator(`[data-id="${id}"] .favorite`).click();
+  await page.locator('#saved-only').check();
+  assert.equal(await page.locator('.concept').count(), 3);
+  await page.reload();
+  assert.equal(await page.locator('.favorite[aria-pressed="true"]').count(), 3);
+  await page.locator('#compare').click();
+  assert.equal(await page.locator('.compare-item').count(), 3);
+  await page.locator('#close-dialog').click();
+  for (const mode of ['dark', 'mono', 'small']) {
+    await page.locator('#' + mode).check();
+    assert.ok(await page.locator('#gallery').evaluate((el, m) => el.classList.contains(m), mode));
+    await page.locator('#' + mode).uncheck();
+  }
+  await page.evaluate(() => { localStorage.clear(); });
+  await page.reload();
+  await page.screenshot({ path: 'work/ui/logo-gallery-100-desktop.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  await page.screenshot({ path: 'work/ui/logo-gallery-100-mobile.png' });
+  await page.setViewportSize({ width: 2000, height: 1600 });
+  await page.goto(url + '?contact=1');
+  await page.screenshot({ path: 'work/ui/logo-contact-sheet-100.png', fullPage: true });
+  assert.deepEqual(errors, []);
+  await browser.close();
+  console.log('Passed: 100 SVGs, selection, category/search, favorites persistence, comparison, preview modes, desktop/mobile layout, contact sheet.');
+})().catch(error => { console.error(error); process.exit(1); });

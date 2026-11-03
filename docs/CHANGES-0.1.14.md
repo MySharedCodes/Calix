@@ -1,0 +1,8 @@
+# Calix 0.1.14
+
+- All complete case notebooks now use single-letter or indexed mathematical identifiers. Unicode numerical subscripts such as `x₁₂` are accepted and share the same variable as `x_12`. Example equations, explanatory text and native solver inputs use the updated symbols. Basic function demonstrations also use compact variable names.
+- The calculation editor accepts Esc, an abbreviation, and Esc again. `a` inserts alpha; `intt` opens an indefinite integral with editable integrand and variable slots. `dint`, `sum`, `prod`, `lim`, `sqrt`, `frac`, `sup` and `sub` open matching formula templates. Tab moves between template slots. Insert converts the formula to executable source.
+- Symbol entry includes lowercase and uppercase Greek letters, common Greek variants, infinity, degree, imaginary and exponential constants, comparison and arithmetic operators. Both Unicode and supported `\[NamedCharacter]` forms reach the calculation engine. This is a common subset of the Mathematica-style input conventions, not the complete Mathematica 13 character or language set.
+- Unit multiplication uses visible centered dots in plain text and rendered mathematics. Slash notation and denominator parentheses remain in place.
+- Japanese, French, Russian, German and Spanish join Chinese and English. All 181 interface translation keys have entries in the five new dictionaries. Menus, settings, dialogs, prompts and example-directory titles switch immediately and persist across restarts. Case body text, user-written notes, output descriptions and calculation commands retain their authored language.
+- No new third-party dependency was added. The installer includes the updated symbol catalog alongside the existing calculation service and C++ core.

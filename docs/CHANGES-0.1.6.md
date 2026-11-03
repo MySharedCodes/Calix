@@ -1,0 +1,11 @@
+# Calix 0.1.6
+
+- All case notebooks appear in Examples, without a Challenge problems section.
+- Case prose contains problem statements, parameters, model assumptions and short section labels. Analytic commentary, hand-written proofs, rankings and external references were removed. Parameter scans, limits, permutations and bounded integer counterexample searches run in Calix. Finite searches report only their specified ranges; they are not a universal proof.
+- Added an elastic double pendulum with two finite-natural-length springs and two masses. Calix differentiates the potential to obtain forces and a stiffness matrix, solves the horizontal small-amplitude model exactly, integrates the full nonlinear four-coordinate model, compares trajectories, checks energy and animates springs and both balls.
+- Added five equal masses connected by four equal springs. The top mass is held until the chain is at rest, then released. Static positions and subsequent motion are computed in Calix. The complete one-dimensional linear model has an exact solution, including a zero-frequency free-fall mode. Output includes initial acceleration, center of mass, a bottom-mass Taylor series, positions, separations and animation. There are no ball collisions over the example's time range.
+- `DSolve`/`DSolveValue` use exact normal modes for undamped, constant-coefficient systems with nonnegative, diagonalizable stiffness, up to eight functions with complete initial conditions. Other equations retain the existing SymPy path.
+- `NDSolveValue` supports up to 16 first- or second-order functions and 32 first-order states. Adaptive integration and composite numerical plotting use C++/Boost; saved states support cubic Hermite interpolation.
+- Added bounded `Table`, `If`, `Nothing`, `Flatten`, `Join`, `Accumulate`, `Permutations`, exact-pattern `Count`, `IntegerQ`, `Mod`, `Intersection`, `SolveValues`, multidimensional `Part`, and `Graphics` with Line/Point. Table is limited to 100,000 leaf evaluations per call; permutations are limited to eight elements. Graphics animations are sampled once and share fixed axes and equal spatial scales.
+- Updated case identity creates fresh notebooks when opening revised examples. Existing user notebooks and prior example edits are preserved.
+- No new third-party dependencies were added.

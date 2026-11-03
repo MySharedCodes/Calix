@@ -1,0 +1,12 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "等高线",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nContourPlot[x^2-y^2,{x,-3,3},{y,-3,3}]"
+    }
+  ]
+}

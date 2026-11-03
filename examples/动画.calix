@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "动画",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nAnimate[ParametricPlot[{Cos[t],Sin[t]},{t,0,2 Pi}]]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nAnimate[Plot[Sin[x-a],{x,-Pi,Pi}],{a,0,2 Pi}]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nAnimate[ParametricPlot[{Cos[3 t],Sin[2 t]},{t,0,2 Pi}]]"
+    }
+  ]
+}

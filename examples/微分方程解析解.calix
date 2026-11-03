@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "微分方程解析解",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nf = DSolveValue[{y'[x]==-2 y[x],y[0]==1},y[x],x];\nf\nPlot[f,{x,0,5}]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nf = DSolveValue[{y''[x]+y[x]==0,y[0]==1,y'[0]==0},y[x],x];\nf\nPlot[f,{x,0,4 Pi}]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nv = DSolveValue[{vx'[t]==-vx[t]/5,vy'[t]==-981/100-vy[t]/5,vx[0]==10,vy[0]==15},{vx[t],vy[t]},t];\nv\nPlot[v,{t,0,3}]"
+    }
+  ]
+}

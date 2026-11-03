@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "代数方程组",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nSolve[{x+y==3,x-y==1},{x,y}]\nPlot[{3-x,x-1},{x,0,4}]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nSolve[{x^2+y^2==5,x-y==1},{x,y}]\nContourPlot[(x^2+y^2-5) (x-y-1),{x,-3,3},{y,-3,3}]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nSolve[x^4-5 x^2+4==0,x]\nPlot[x^4-5 x^2+4,{x,-2.5,2.5}]"
+    }
+  ]
+}

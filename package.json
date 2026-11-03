@@ -1,0 +1,54 @@
+{
+  "name": "calix",
+  "version": "0.1.27",
+  "private": true,
+  "description": "CALculation and Interactive eXpressions",
+  "license": "UNLICENSED",
+  "type": "module",
+  "overrides": {
+    "katex": "$katex"
+  },
+  "scripts": {
+    "dev": "node scripts/prepare-assets.mjs && vite --config frontend/vite.config.ts --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "node scripts/prepare-assets.mjs && tsc --noEmit && vite build --config frontend/vite.config.ts",
+    "preview": "vite preview --config frontend/vite.config.ts --host 127.0.0.1 --port 5174 --strictPort",
+    "tauri": "tauri",
+    "test:ui": "node tests/ui-smoke.cjs",
+    "test:upgrade": "node tests/ui-upgrade.cjs",
+    "test:workflow": "node tests/ui-workflow.cjs",
+    "test:workspace": "node tests/ui-workspace.cjs",
+    "test:logos": "node tests/logo-gallery.cjs"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "6.18.6",
+    "@codemirror/commands": "6.8.1",
+    "@codemirror/language": "6.11.0",
+    "@codemirror/state": "6.5.2",
+    "@codemirror/view": "6.36.5",
+    "@cortex-js/compute-engine": "0.30.2",
+    "@tauri-apps/api": "2.5.0",
+    "@tauri-apps/plugin-dialog": "2.2.2",
+    "fflate": "0.8.2",
+    "katex": "0.19.1",
+    "lucide-react": "0.468.0",
+    "mathlive": "0.111.1",
+    "plotly.js-cartesian-dist-min": "3.0.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-markdown": "10.1.0",
+    "rehype-katex": "7.0.1",
+    "remark-gfm": "4.0.1",
+    "remark-math": "6.0.0",
+    "three": "0.176.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.5.0",
+    "@types/katex": "0.16.7",
+    "@types/react": "19.1.2",
+    "@types/react-dom": "19.1.2",
+    "@types/three": "0.176.0",
+    "@vitejs/plugin-react": "4.4.1",
+    "typescript": "5.8.3",
+    "vite": "6.4.5"
+  }
+}

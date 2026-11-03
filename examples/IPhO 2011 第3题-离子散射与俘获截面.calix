@@ -1,0 +1,37 @@
+{
+  "title": "IPhO 2011 第3题：离子散射与俘获截面",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# IPhO 2011 第3题：离子散射与俘获截面\n\n质量 m、电荷 Q 的离子，以非相对论初速度 v₀ 从远处接近一个中性原子，碰撞参数为 b。原子质量远大于 m，位置视为固定；其电极化率为 α，诱导偶极矩满足 p=αE。忽略辐射损失。\n\n求偶极矩轴线上的电场、离子受到的力、相互作用势能、散射时的最近距离，以及发生电荷交换俘获的截面积。α、m、v₀、真空介电常数 ε₀ 均为正；Q 可正可负。\n\n## 偶极场、力与相互作用势\n\n以相距 2a、电荷为 ±q 的电荷对表示偶极子，令 p=2aq。计算轴线电场的极限，将诱导偶极矩代入，再对力积分。r₅ 的负号表示吸引。最后检查 Q 反号时力是否改变。",
+      "id": "case-16-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[r,a,p,Q,α,ε,m,v₀,b,w];\nd₁=Limit[p/(2*a)/(4*Pi*ε)*(1/(r-a)^2-1/(r+a)^2),a->0];\ni₃=Q/(4*Pi*ε*r^2);\ni₁=α*i₃;\nr₅=Simplify[-Q*ReplaceAll[d₁,p->i₁]];\nU=Integrate[-r₅,r];\nC₄=Simplify[-U*r^4];\nColumn[{\n  Labeled[d₁,\"dipole axial electric field\"],\n  Labeled[r₅,\"radial force on ion\"],\n  Labeled[U,\"interaction potential, zero at infinity\"],\n  Labeled[Simplify[ReplaceAll[r₅,Q->-Q]-r₅],\"force change under Q -> -Q\"]\n}]",
+      "id": "case-16-1"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 最近距离与俘获截面\n\n用远处的初始速度、碰撞参数确定能量和角动量。将径向速度为零的条件交给 Calix 解方程；散射取较大的正半径。再求转向点合并时的碰撞参数 b₀，以及 πb₀²。b>b₀ 对应散射，b<b₀ 对应模型中的俘获；b=b₀ 为临界情形。",
+      "id": "case-16-2"
+    },
+    {
+      "mode": "source",
+      "code": "H=m*v₀^2/2;\na₇=m*v₀*b;\ne₂=a₇^2/(2*m*r^2)+U;\nt₄=Expand[ReplaceAll[(H-e₂)*r^4,r->Sqrt[w]]];\nt₃=SolveValues[t₄==0,w];\nc₅=Sqrt[Last[t₃]];\nd₂=Simplify[b^4-8*C₄/(m*v₀^2)];\nc₁₀=First[SolveValues[ReplaceAll[d₂,b^4->w]==0,w]];\nc₉=c₁₀^(1/4);\nc₁₁=Pi*Sqrt[c₁₀];\nColumn[{\n  Labeled[e₂,\"effective radial potential\"],\n  Labeled[t₃,\"turning radii squared, inner and outer roots\"],\n  Labeled[c₅,\"closest approach for scattering, b > B₀\"],\n  Labeled[c₉,\"critical impact parameter B₀\"],\n  Labeled[c₁₁,\"charge-exchange capture cross section, pi B₀^2\"],\n  Labeled[Simplify[ReplaceAll[t₄,w->Last[t₃]]],\"outer turning-point equation residual\"]\n}]",
+      "id": "case-16-3"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 有效势与最近距离\n\n为比较曲线，下面另取无量纲参数 m=v₀=1、C₄=1/2，其中 C₄ 是前面计算的吸引势系数。三条有效势曲线分别对应 b=1、b=b₀ 和 b=2；水平线为入射能量。最近距离曲线只画散射区域。此图使用的无量纲参数不代表额外的实验数据。",
+      "id": "case-16-4"
+    },
+    {
+      "mode": "source",
+      "code": "n₅=b^2/(2*r^2)-1/(2*r^4);\nB₀=Sqrt[2];\nn₆=Sqrt[(b^2+Sqrt[b^4-4])/2];\nColumn[{\n  Labeled[Plot[{ReplaceAll[n₅,b->1],ReplaceAll[n₅,b->B₀],ReplaceAll[n₅,b->2],1/2},{r,0.5,4},PlotRange->{-1,2},PlotLegends->{\"b=1\",\"b=B₀\",\"b=2\",\"incident energy\"}],\"dimensionless effective radial potentials\"],\n  Labeled[Plot[n₆,{b,B₀,4}],\"closest approach versus impact parameter, scattering branch\"],\n  Labeled[{B₀,Pi*B₀^2},\"dimensionless {critical impact parameter,capture cross section}\"]\n}]",
+      "id": "case-16-5"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

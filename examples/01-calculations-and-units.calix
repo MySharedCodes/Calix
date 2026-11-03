@@ -1,0 +1,47 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "01-calculations-and-units",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "1/3 + Sqrt[2]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "N[Pi,80]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Sum[1/n^2,{n,1,Infinity}]"
+    },
+    {
+      "id": "example-3",
+      "mode": "source",
+      "code": "Product[k,{k,1,10}]"
+    },
+    {
+      "id": "example-4",
+      "mode": "source",
+      "code": "N[Hypergeometric2F1[1/2,1/2,1,1/2],40]"
+    },
+    {
+      "id": "example-5",
+      "mode": "source",
+      "code": "UnitConvert[3[m]+20[cm],\"cm\"]"
+    },
+    {
+      "id": "example-6",
+      "mode": "source",
+      "code": "UnitConvert[0[degC],\"K\"]"
+    },
+    {
+      "id": "example-7",
+      "mode": "source",
+      "code": "Sin[90[deg]]"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Calix",
+  "version": "0.1.27",
+  "identifier": "com.calix.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../frontend/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Calix",
+        "width": 1280,
+        "height": 880,
+        "minWidth": 720,
+        "minHeight": 540,
+        "backgroundColor": "#f6f8fa"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src ipc: http://ipc.localhost http://127.0.0.1:*; worker-src 'self' blob:"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "resources": {
+      "../release/backend/calix-service/": "backend/",
+      "../release/notices/": "notices/",
+      "../calix.cmd": "calix.cmd",
+      "../native/build/Release/calix-cli.exe": "calix-cli.exe",
+      "../API.md": "API.md",
+      "../AGENTS.md": "AGENTS.md",
+      "../AI-CONTROL.md": "AI-CONTROL.md",
+      "../docs/": "docs/",
+      "../README.md": "README.md",
+      "../README.zh-CN.md": "README.zh-CN.md",
+      "../CONTRIBUTING.md": "CONTRIBUTING.md",
+      "../SECURITY.md": "SECURITY.md",
+      "../LICENSE": "LICENSE",
+      "../examples/": "examples/"
+    },
+    "shortDescription": "Local symbolic and numerical mathematics",
+    "category": "Education",
+    "fileAssociations": [
+      {
+        "ext": ["cixnb", "clxnb", "calix"],
+        "name": "Calix.Notebook",
+        "description": "Calix calculation notebook",
+        "role": "Editor"
+      }
+    ],
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "compression": "zlib",
+        "languages": [
+          "English",
+          "SimpChinese",
+          "Japanese",
+          "French",
+          "Russian",
+          "German",
+          "Spanish"
+        ],
+        "displayLanguageSelector": true
+      }
+    }
+  }
+}

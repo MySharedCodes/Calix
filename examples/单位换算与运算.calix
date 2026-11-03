@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "单位换算与运算",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nUnitConvert[3[m]+20[cm],\"cm\"]\nUnitConvert[0[degC],\"K\"]\nUnitConvert[72[km/h],\"m/s\"]\nUnitConvert[1[bar],\"Pa\"]\nUnitConvert[1[kWh],\"J\"]\n[kg*m/s^2]\n[N/m^2]\n2[\"牛顿\"]*3[\"米\"]\n1[kg/(m*s)]\n10[m/s]*2[s]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nUnitConvert[1[inch],\"cm\"]\nUnitConvert[100[degC],\"degF\"]\nUnitConvert[9.81[m/s^2],\"cm/s^2\"]\nUnitConvert[1[L],\"cm^3\"]\nUnitConvert[1[atm],\"kPa\"]\n2[kg]*3[m/s^2]\n12[J]/3[m]\n10[N]*2[m]\n100[W]*3[s]\n12[V]/2[A]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nUnitConvert[1[\"µm\"],\"nm\"]\nUnitConvert[1[m^2],\"cm^2\"]\nUnitConvert[1[eV],\"J\"]\nUnitConvert[60[mile/h],\"km/h\"]\nUnitConvert[32[degF],\"degC\"]\n[V]*[A]\n[A]*[s]\n[kg*m^2/s^3]\n[T]*[m^2]\n1[kg*m^2/(s^3*K)]"
+    }
+  ]
+}

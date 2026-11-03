@@ -1,0 +1,12 @@
+const fs=require('node:fs');
+const path='components/themes.css';
+let css=fs.readFileSync(path,'utf8');
+const svg=fs.readFileSync('components/theme-assets/ocean-orca.svg','utf8');
+const uri='data:image/svg+xml,'+encodeURIComponent(svg).replaceAll("'",'%27');
+css=css.replace(/(:root\[data-theme=ocean\][^\n]*?--pattern:)url\([^\n]*?\)\}/,(_,start)=>start+`url("${uri}")}`);
+const rule=':root[data-theme=ocean] .main-shell{background-image:var(--pattern);background-repeat:no-repeat;background-position:right 36px bottom 70px;background-size:360px 252px;background-attachment:fixed}\n:root[data-theme=ocean] .notebook{background-image:none}\n@media(max-width:760px){:root[data-theme=ocean] .main-shell{background-position:right 8px bottom 42px;background-size:280px 196px}}';
+css=css.replace(/\n:root\[data-theme=ocean\] \.notebook\{[^}]*\}/g,'');
+css=css.replace(/\n:root\[data-theme=ocean\] \.main-shell\{[^}]*\}/g,'');
+css=css.replace(/\n@media\(max-width:760px\)\{:root\[data-theme=ocean\] \.main-shell\{[^}]*\}\}/g,'');
+css+='\n'+rule+'\n';
+fs.writeFileSync(path,css);

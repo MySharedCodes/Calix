@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "级数展开",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nSeries[Log[(1+x)/(1-x)]-2*x-2*x^3/3-2*x^5/5,{x,0,10}]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nSeries[(Exp[x]-1-x-x^2/2-x^3/6)/x^4,{x,0,4}]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nSeries[(Sin[x]-x*Cos[x])/x^3,{x,0,6}]"
+    }
+  ]
+}

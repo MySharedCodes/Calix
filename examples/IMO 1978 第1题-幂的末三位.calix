@@ -1,0 +1,17 @@
+{
+  "title": "IMO 1978 第1题：幂的末三位",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# IMO 1978 第1题：幂的末三位\n\n求正整数 $m<n$，使 $1978^m$ 与 $1978^n$ 的十进制末三位相同，并使 $m+n$ 最小。\n\n## 模幂与整数搜索\n\n枚举 $1\\le m<n\\le120$。输出最小和、对应的指数对及末三位、搜索范围是否覆盖全部更小的和，并绘制模幂序列。",
+      "id": "case-9-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[m,n,r₁₂];\nb₄=120;\nr₁₁=Table[PowerMod[1978,n,1000],{n,1,b₄}];\np₃=Flatten[Table[If[Part[r₁₁,m]==Part[r₁₁,n],{m,n},Nothing],{n,2,b₄},{m,1,n-1}],1];\nb₂=Min[Table[Total[r₁₂],{r₁₂,p₃}]];\nw₁=Table[If[Total[r₁₂]==b₂,Join[r₁₂,{Part[r₁₁,First[r₁₂]]}],Nothing],{r₁₂,p₃}];\nColumn[{\n  Labeled[b₂, \"minimum m+n\"],\n  Labeled[w₁, \"{m,n,last three digits}\"],\n  Labeled[b₂<b₄+1, \"search covers every smaller sum\"],\n  Labeled[ListPlot[Table[{n,Part[r₁₁,n]},{n,1,b₄}]], \"1978^n modulo 1000\"]\n}]",
+      "id": "case-9-1"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

@@ -1,0 +1,42 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "03-plots",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Plot[{Sin[x],Cos[x]},{x,-Pi,Pi}]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Plot[1/x,{x,-2,2},PlotRange->{-5,5}]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Plot[3[m/s]*t,{t,0[s],2[s]}]"
+    },
+    {
+      "id": "example-3",
+      "mode": "source",
+      "code": "Plot3D[Sin[x] Cos[y],{x,-Pi,Pi},{y,-Pi,Pi}]"
+    },
+    {
+      "id": "example-4",
+      "mode": "source",
+      "code": "ContourPlot[x^2-y^2,{x,-3,3},{y,-3,3}]"
+    },
+    {
+      "id": "example-5",
+      "mode": "source",
+      "code": "ParametricPlot[{Cos[3 t],Sin[2 t]},{t,0,2 Pi}]"
+    },
+    {
+      "id": "example-6",
+      "mode": "source",
+      "code": "ParametricPlot3D[{Cos[t],Sin[t],t/4},{t,0,6 Pi}]"
+    }
+  ]
+}

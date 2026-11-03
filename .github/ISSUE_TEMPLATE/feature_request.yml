@@ -1,0 +1,17 @@
+name: Feature or documentation request
+description: Describe a calculation or workflow that Calix should support.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the concrete task and current difficulty.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example and desired behavior
+      description: Include sample input and a checkable expected outcome where possible.
+    validations:
+      required: true

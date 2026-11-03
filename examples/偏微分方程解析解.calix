@@ -1,0 +1,27 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "偏微分方程解析解",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nClear[u,x,y];\nv=DSolveValue[{D[u[x,y],{y,2}]==-6,u[x,0]==0,u[x,1]==0},u[x,y],{x,y}];\nv\nPlot[v,{y,0,1}]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nClear[u,x,t];\nv=DSolveValue[{D[u[x,t],t]==D[u[x,t],{x,2}],u[0,t]==0,u[1,t]==0,u[x,0]==Sin[Pi*x]},u[x,t],{x,t}];\nv\nPlot3D[v,{x,0,1},{t,0,1}]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nClear[u,x,t];\nv=DSolveValue[{D[u[x,t],{t,2}]==4*D[u[x,t],{x,2}],u[0,t]==0,u[1,t]==0,u[x,0]==Sin[Pi*x]},u[x,t],{x,t}];\nv\nPlot3D[v,{x,0,1},{t,0,1}]"
+    },
+    {
+      "id": "example-3",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nClear[u,x,y];\nDSolve[{D[u[x,y],x]+D[u[x,y],y]==0},u[x,y],{x,y}]"
+    }
+  ]
+}

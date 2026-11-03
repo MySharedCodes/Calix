@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "有理式化简",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nCancel[(x^8-1)/(x^6+x^4+x^2+1)]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nTogether[1/(x-1)-1/(x+1)-2/(x^2-1)]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nCancel[(x^6-y^6)/((x-y)*(x^2+x*y+y^2)*(x^2-x*y+y^2))]"
+    }
+  ]
+}

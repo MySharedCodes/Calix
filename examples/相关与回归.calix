@@ -1,0 +1,17 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "相关与回归",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nd={{1,2},{2,3},{3,5},{4,4},{5,6}};\nf=Fit[d,{1,x},x];\nf\nCorrelation[{1,2,3,4,5},{2,3,5,4,6}]\nListPlot[d]\nPlot[f,{x,0,6}]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nCovariance[{1,2,3,4},{2,4,5,8}]\nCorrelation[{1,2,3,4},{2,4,5,8}]\nSpearmanRho[{1,2,2,4},{4,1,2,3}]\nFit[{{0,1},{1,2},{2,5},{3,10}},{1,x,x^2},x]"
+    }
+  ]
+}

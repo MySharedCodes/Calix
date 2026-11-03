@@ -1,0 +1,33 @@
+name: Calculation error
+description: Report a wrong answer, missing result or solver failure.
+labels: [bug, calculation]
+body:
+  - type: textarea
+    id: input
+    attributes:
+      label: Minimal input
+      description: Copyable input including definitions, runnable in a fresh session. Remove confidential data.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+      description: Exact output or complete error. Was this Run All or an individual cell?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result and verification
+      description: Explain an independent check, substitution, identity or reference value, with domain and precision.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Calix and Windows versions, CPU, Workers, numerical precision and installed modules.
+    validations:
+      required: true

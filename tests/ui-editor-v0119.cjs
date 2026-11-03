@@ -1,0 +1,68 @@
+const {chromium}=require(process.env.CALIX_PLAYWRIGHT||'C:/Users/Numerical_Magic_Box/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const assert=require('node:assert/strict'),fs=require('node:fs');
+(async()=>{
+ const desktop=!!process.env.CALIX_DESKTOP;
+ const browser=desktop?await chromium.connectOverCDP('http://127.0.0.1:9223'):await chromium.launch({channel:'msedge',headless:true});
+ try{
+  const page=desktop?browser.contexts()[0].pages()[0]:await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  if(!desktop)await page.goto('http://127.0.0.1:8767');
+  await page.setViewportSize({width:1440,height:1000});await page.getByText('原生核心就绪').waitFor();
+  await page.getByRole('button',{name:'新建笔记',exact:true}).first().click();
+  let editor=page.locator('.cm-content').first();
+  const shortcut=async alias=>{
+   await editor.press('Escape');const input=page.getByRole('textbox',{name:'特殊符号缩写',exact:true});
+   await input.fill(alias);await input.press('Escape');
+  };
+  const run=async()=>{
+   const response=page.waitForResponse(r=>r.url().endsWith('/api/evaluate')&&r.request().method()==='POST');
+   await editor.press('Control+Enter');const data=await(await response).json();assert.ok(data.ok,JSON.stringify(data));return data.result;
+  };
+  await editor.click();await page.keyboard.insertText('1+');await editor.press('Escape');
+  const box=await page.locator('.symbol-input').boundingBox(),source=await editor.boundingBox();
+  assert.ok(box.y>=source.y && box.y<=source.y+source.height+15,JSON.stringify({box,source}));
+  assert.equal(await page.locator('.symbol-input').evaluate(el=>getComputedStyle(el).position),'fixed');
+  await page.getByRole('textbox',{name:'特殊符号缩写',exact:true}).fill('intt');
+  await page.getByRole('textbox',{name:'特殊符号缩写',exact:true}).press('Escape');
+  const mf=page.locator('.formula-composer math-field');await mf.waitFor();
+  await mf.evaluate(el=>el.value=String.raw`\int_0^1 x^2\,\mathrm{d}x`);
+  await page.getByRole('button',{name:'插入',exact:true}).click();
+  assert.equal(await page.locator('.inline-formula').count(),1);
+  assert.ok(!(await editor.innerText()).includes('Integrate'),await editor.innerText());
+  assert.equal((await run()).text,'4/3');
+  await page.locator('.inline-formula').click();await mf.waitFor();
+  await mf.evaluate(el=>el.value=String.raw`\sum_{k=1}^{10}k^2`);
+  await page.getByRole('button',{name:'插入',exact:true}).click();
+  assert.equal((await run()).text,'386');
+  await editor.press('End');await page.keyboard.insertText('+1');
+  assert.equal(await page.locator('.inline-formula').count(),1,'Typing at a formula boundary preserves typesetting');
+  assert.equal((await run()).text,'387');
+  await editor.press('Control+z');
+  assert.equal(await page.locator('.inline-formula').count(),1,'Undo preserves formula metadata');
+  assert.equal((await run()).text,'386');
+  await editor.press('Backspace');
+  assert.equal(await page.locator('.inline-formula').count(),0);
+  await editor.press('Control+z');
+  assert.equal(await page.locator('.inline-formula').count(),1,'Undo restores deleted typeset formula');
+  assert.equal((await run()).text,'386');
+  await page.waitForTimeout(500);await page.reload();await page.getByText('原生核心就绪').waitFor();
+  editor=page.locator('.cm-content').first();await page.locator('.inline-formula').waitFor();
+  assert.equal((await run()).text,'386');
+  await page.screenshot({path:'work/ui/inline-formula-v0119.png'});
+  await page.getByRole('button',{name:'计算示例',exact:true}).click();
+  const analytical=page.locator('.example-group').filter({has:page.getByRole('heading',{name:'解析与符号计算',exact:true})});
+  assert.equal(await analytical.locator('button span').last().innerText(),'偏微分方程解析解');
+  await page.getByTitle('关闭示例',{exact:true}).click();
+  await page.getByRole('button',{name:'新建笔记',exact:true}).first().click();editor=page.locator('.cm-content').first();
+  await editor.click();await shortcut('sca');assert.ok((await editor.innerText()).includes('𝒶'));
+  await page.keyboard.insertText('=3;');await shortcut('sca');await page.keyboard.insertText('^2');assert.equal((await run()).text,'9');
+  await page.setViewportSize({width:390,height:844});await editor.press('End');await editor.press('Escape');
+  const mobile=await page.locator('.symbol-input').boundingBox();assert.ok(mobile.x>=0&&mobile.x+mobile.width<=391);
+  await page.getByRole('textbox',{name:'特殊符号缩写',exact:true}).fill('sc');
+  assert.ok(await page.locator('.symbol-options button').count()>20);
+  await page.screenshot({path:'work/ui/symbol-palette-mobile-v0119.png'});
+  assert.deepEqual(errors,[]);
+  const report={status:'passed',caretPopup:true,inlineFormula:true,editFormula:true,reload:true,scriptLetters:true,pdeLast:true,mobile:true,errors};
+  fs.writeFileSync(`work/ui-editor-${desktop?'desktop':'browser'}-v0119-report.json`,JSON.stringify(report,null,2));console.log(report);
+ }finally{await browser.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

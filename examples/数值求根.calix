@@ -1,0 +1,12 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "数值求根",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nFindRoot[Cos[x]-x,{x,0,1}]\nPlot[Cos[x]-x,{x,0,1}]"
+    }
+  ]
+}

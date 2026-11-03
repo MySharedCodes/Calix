@@ -1,0 +1,16 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),ts=require('typescript');
+const moduleObject={exports:{}};
+const code=ts.transpileModule(fs.readFileSync('frontend/src/workspace-codec.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+vm.runInNewContext(code,{module:moduleObject,exports:moduleObject.exports,require,btoa,atob,Uint8Array});
+const {parseWorkspace,serializeWorkspace}=moduleObject.exports;
+const ordinary={version:1,title:'旧笔记',cells:[{code:'1+1'}]};
+assert.equal(JSON.stringify(parseWorkspace(JSON.stringify(ordinary))),JSON.stringify(ordinary));
+const workspace=JSON.parse(fs.readFileSync('work/bridge-browser-v0118-saved.json','utf8'));
+const wing=JSON.parse(fs.readFileSync('work/wing-browser-v0118-saved.json','utf8'));
+workspace.documents.push(...wing.documents);
+const start=performance.now(),packed=serializeWorkspace(workspace),seconds=(performance.now()-start)/1000;
+assert.ok(packed.startsWith('calix-zlib-v1:'));
+assert.ok(packed.length<JSON.stringify(workspace).length/3);
+assert.equal(JSON.stringify(parseWorkspace(packed)),JSON.stringify(workspace));
+assert.throws(()=>parseWorkspace('calix-zlib-v1:broken'));
+console.log(JSON.stringify({status:'passed',original:JSON.stringify(workspace).length,compressed:packed.length,seconds}));

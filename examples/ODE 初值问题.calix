@@ -1,0 +1,12 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "ODE 初值问题",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nNDSolve[{y'[t]==-y[t]+Sin[t],y[0]==1},y,{t,0,15}]"
+    }
+  ]
+}

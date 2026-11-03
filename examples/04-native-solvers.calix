@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "04-native-solvers",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "FindRoot[Cos[x]-x,{x,0,1}]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "NIntegrate[Exp[-x^2],{x,-3,3}]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "NDSolve[{y'[t]==-y[t]+Sin[t],y[0]==1},y,{t,0,15}]"
+    }
+  ]
+}

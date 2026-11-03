@@ -1,0 +1,57 @@
+{
+  "title": "五球弹簧串：松手下落",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# 五球弹簧串：松手下落\n\n五个质量均为 $1$ kg 的小球由四段无质量弹簧串联，弹簧刚度均为 $100$ N/m，原长均为 $1$ m。握住最上方小球，使整串竖直静止，随后松手。取竖直向下为正方向，最上方小球初始位置为 $0$，$g=9.81$ m/s²。不计空气阻力、弹簧质量和小球碰撞。\n\n求五球的解析运动、初始加速度及质心运动，观察松手后 $5$ s 内的运动。\n\n## 悬挂平衡位置",
+      "id": "case-11-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[a₁,a₂,a₃,a₄,a₅,y₁,y₂,y₃,y₄,y₅,t,τ,i,u];\nm=1; k=100; l=1; g=981/100; d₄=5;\nr₀=First[SolveValues[{\n  a₁==0,\n  0==m*g+k*(a₃-2*a₂+a₁),\n  0==m*g+k*(a₄-2*a₃+a₂),\n  0==m*g+k*(a₅-2*a₄+a₃),\n  0==m*g-k*(a₅-a₄-l)\n},{a₁,a₂,a₃,a₄,a₅}]];\nLabeled[r₀, \"initial positions, balls 1...5 [m]\"]",
+      "id": "case-11-1"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 五球解析解",
+      "id": "case-11-2"
+    },
+    {
+      "mode": "source",
+      "code": "q₂={y₁[t],y₂[t],y₃[t],y₄[t],y₅[t]};\ne₁={\n  y₁''[t]==g+k/m*(y₂[t]-y₁[t]-l),\n  y₂''[t]==g+k/m*(y₃[t]-2*y₂[t]+y₁[t]),\n  y₃''[t]==g+k/m*(y₄[t]-2*y₃[t]+y₂[t]),\n  y₄''[t]==g+k/m*(y₅[t]-2*y₄[t]+y₃[t]),\n  y₅''[t]==g-k/m*(y₅[t]-y₄[t]-l)\n};\nc₀=Flatten[Table[{ReplaceAll[Part[q₂,i],t->0]==Part[r₀,i],ReplaceAll[D[Part[q₂,i],t],t->0]==0},{i,1,5}],1];\nr₁=DSolveValue[Join[e₁,c₀],{y₁[t],y₂[t],y₃[t],y₄[t],y₅[t]},t];\nColumn[{\n  Labeled[Part[r₁,1],\"position, ball 1\"],\n  Labeled[Part[r₁,2],\"position, ball 2\"],\n  Labeled[Part[r₁,3],\"position, ball 3\"],\n  Labeled[Part[r₁,4],\"position, ball 4\"],\n  Labeled[Part[r₁,5],\"position, ball 5\"]\n}]",
+      "id": "case-11-3"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 松手后的初始运动",
+      "id": "case-11-4"
+    },
+    {
+      "mode": "source",
+      "code": "c₂=Simplify[Total[r₁]/5];\nColumn[{\n  Labeled[Simplify[Table[ReplaceAll[D[Part[r₁,i],{t,2}],t->0],{i,1,5}]], \"initial accelerations, balls 1...5 [m/s^2]\"],\n  Labeled[c₂, \"center of mass position [m]\"],\n  Labeled[Series[Part[r₁,5],{t,0,10}], \"bottom ball position series [m]\"]\n}]",
+      "id": "case-11-5"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 底部两球与自由落体的位移对比\n\n向下位移均从各自的初始位置计起。第一张图依次绘制最下方小球、倒数第二个小球和从静止开始的自由落体；第二张图绘制这两个小球相对自由落体的位移差。时间范围为 0 至 5 s，并画出自由落体对应的零基线。",
+      "id": "case-11-6"
+    },
+    {
+      "mode": "source",
+      "code": "b₃=Part[r₁,5]-Part[r₀,5];\nn₂=Part[r₁,4]-Part[r₀,4];\nf₁=g*t^2/2;\nColumn[{\n  Labeled[Plot[{b₃,n₂,f₁},{t,0,d₄},PlotLegends->{\"最下方小球\",\"倒数第二个小球\",\"自由落体\"}], \"bottom two balls and free-fall displacements [m]\"],\n  Labeled[Plot[{b₃-f₁,n₂-f₁,0},{t,0,d₄},PlotLegends->{\"底球相对自由落体\",\"次底球相对自由落体\",\"自由落体（零基线）\"}], \"displacement differences from free fall [m]\"]\n}]",
+      "id": "case-11-7"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 下落动画\n\n视角随质心下落，纵坐标表示相对质心的位置。",
+      "id": "case-11-8"
+    },
+    {
+      "mode": "source",
+      "code": "r₃=Table[Simplify[Part[r₁,i]-c₂],{i,1,5}];\nc₆=Table[Table[{3/25*Sin[12*Pi*u],-(1-u)*Part[r₃,i]-u*Part[r₃,i+1]},{u,0,1,1/24}],{i,1,4}];\nb₁=Table[{0,-Part[r₃,i]},{i,1,5}];\nLabeled[Animate[Graphics[{\n  Line[ReplaceAll[Part[c₆,1],t->τ]],Line[ReplaceAll[Part[c₆,2],t->τ]],\n  Line[ReplaceAll[Part[c₆,3],t->τ]],Line[ReplaceAll[Part[c₆,4],t->τ]],\n  Point[ReplaceAll[b₁,t->τ]]\n}],{τ,0,d₄}], \"spring chain, positions relative to center of mass [m]\"]",
+      "id": "case-11-9"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

@@ -1,0 +1,57 @@
+{
+  "title": "弹性双摆：两段弹簧与两个小球",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# 弹性双摆：两段弹簧与两个小球\n\n固定点、第一球、第二球依次由两段无质量弹簧连接。两球质量均为 $1$ kg，弹簧刚度均为 $40$ N/m，原长均为 $1$ m，$g=9.81$ m/s²。取竖直向下为 $y$ 正方向，不计阻尼和空气阻力。\n\n分别计算小振幅线性模型和大振幅完整非线性模型。两种情况均静止释放。\n\n## 平衡位置与线性化",
+      "id": "case-10-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[x₁,y₁,x₂,y₂,h₁,h₂,u₃,u₄,t,τ,i,j,u];\nm=1; k=40; l=1; g=981/100;\nh₀=First[SolveValues[{k*(h₁-l)==2*m*g,k*(h₂-l)==m*g},{h₁,h₂}]];\nr₀={0,Part[h₀,1],0,Total[h₀]};\nq₁={x₁,y₁,x₂,y₂};\nU=k/2*(Sqrt[x₁^2+y₁^2]-l)^2+k/2*(Sqrt[(x₂-x₁)^2+(y₂-y₁)^2]-l)^2-m*g*(y₁+y₂);\nF=Table[-D[U,Part[q₁,i]]/m,{i,1,4}];\na₈={x₁->Part[r₀,1],y₁->Part[r₀,2],x₂->Part[r₀,3],y₂->Part[r₀,4]};\nK=Simplify[Table[ReplaceAll[D[U,Part[q₁,i],Part[q₁,j]]/m,a₈],{i,1,4},{j,1,4}]];\nColumn[{\n  Labeled[r₀, \"equilibrium positions, {x₁,y₁,x₂,y₂} [m]\"],\n  Labeled[K, \"stiffness / mass matrix [1/s^2]\"],\n  Labeled[Eigenvalues[K], \"squared mode frequencies [1/s^2]\"]\n}]",
+      "id": "case-10-1"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 小振幅解析解\n\n两球从竖直平衡位置分别向右偏移 $0.05$ m、$0.12$ m。",
+      "id": "case-10-2"
+    },
+    {
+      "mode": "source",
+      "code": "u₀=DSolveValue[{\n  u₃''[t]==-Part[K,1,1]*u₃[t]-Part[K,1,3]*u₄[t],\n  u₄''[t]==-Part[K,3,1]*u₃[t]-Part[K,3,3]*u₄[t],\n  u₃[0]==1/20,u₄[0]==3/25,u₃'[0]==0,u₄'[0]==0\n},{u₃[t],u₄[t]},t];\nColumn[{\n  Labeled[Part[u₀,1],\"displacement, first ball\"],\n  Labeled[Part[u₀,2],\"displacement, second ball\"]\n}]",
+      "id": "case-10-3"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 大振幅数值解\n\n第一段弹簧相对向下竖直方向偏转 $60°$，第二段偏转 $-45°$，初始长度取悬挂平衡长度，初速度为零。完整非线性方程使用数值积分。",
+      "id": "case-10-4"
+    },
+    {
+      "mode": "source",
+      "code": "q₂={x₁[t],y₁[t],x₂[t],y₂[t]};\nt₁={x₁->x₁[t],y₁->y₁[t],x₂->x₂[t],y₂->y₂[t]};\ne₁=Table[D[Part[q₂,i],{t,2}]==ReplaceAll[Part[F,i],t₁],{i,1,4}];\nθ₁=60°; θ₂=-45°;\nx₀={Part[h₀,1]*Sin[θ₁],Part[h₀,1]*Cos[θ₁],Part[h₀,1]*Sin[θ₁]+Part[h₀,2]*Sin[θ₂],Part[h₀,1]*Cos[θ₁]+Part[h₀,2]*Cos[θ₂]};\nc₀=Flatten[Table[{ReplaceAll[Part[q₂,i],t->0]==Part[x₀,i],ReplaceAll[D[Part[q₂,i],t],t->0]==0},{i,1,4}],1];\nr₁=NDSolveValue[Join[e₁,c₀],{x₁[t],y₁[t],x₂[t],y₂[t]},{t,0,6}];\nLabeled[r₁, \"large-angle position functions, {x₁,y₁,x₂,y₂} [m]\"]",
+      "id": "case-10-5"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 位移与能量",
+      "id": "case-10-6"
+    },
+    {
+      "mode": "source",
+      "code": "H=ReplaceAll[U,{x₁->Part[r₁,1],y₁->Part[r₁,2],x₂->Part[r₁,3],y₂->Part[r₁,4]}]+m/2*Total[Table[D[Part[r₁,i],t]^2,{i,1,4}]];\nColumn[{\n  Labeled[Plot[u₀,{t,0,6},PlotLegends->{\"第一球\",\"第二球\"}], \"small-angle horizontal displacements [m]\"],\n  Labeled[Plot[{Part[r₁,1],Part[r₁,3]},{t,0,6},PlotLegends->{\"第一球\",\"第二球\"}], \"large-angle horizontal displacements [m]\"],\n  Labeled[Plot[H-ReplaceAll[H,t->0],{t,0,6}], \"total energy drift [J]\"]\n}]",
+      "id": "case-10-7"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 大振幅运动动画",
+      "id": "case-10-8"
+    },
+    {
+      "mode": "source",
+      "code": "k₁=Table[{u*Part[r₁,1]+Sin[12*Pi*u]/30,-u*Part[r₁,2]},{u,0,1,1/30}];\nk₂=Table[{(1-u)*Part[r₁,1]+u*Part[r₁,3]+Sin[12*Pi*u]/30,-(1-u)*Part[r₁,2]-u*Part[r₁,4]},{u,0,1,1/30}];\nLabeled[Animate[Graphics[{\n  Line[ReplaceAll[k₁,t->τ]],Line[ReplaceAll[k₂,t->τ]],\n  Point[ReplaceAll[{{Part[r₁,1],-Part[r₁,2]},{Part[r₁,3],-Part[r₁,4]}},t->τ]]\n}],{τ,0,6}], \"large-angle motion, coordinates [m]\"]",
+      "id": "case-10-9"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

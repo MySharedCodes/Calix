@@ -1,0 +1,17 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "差分方程",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nr = RSolve[{q[n+1]==2 q[n]+1,q[0]==0},q[n],n];\nr\nPlot[ReplaceAll[q[n],r],{n,0,10}]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nr = RSolve[{q[n+1]==q[n]+n,q[0]==0},q[n],n];\nr\nPlot[ReplaceAll[q[n],r],{n,0,20}]"
+    }
+  ]
+}

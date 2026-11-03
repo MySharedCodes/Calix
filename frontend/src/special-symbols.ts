@@ -1,0 +1,50 @@
+import characters from '../../backend/characters.json';
+
+export type SpecialSymbol = { name: string; aliases: string[]; symbol?: string; template?: string; literal?: string };
+export const specialSymbols: SpecialSymbol[] = characters.map(([name, symbol, ...aliases]) => ({ name, symbol,
+  aliases: [...new Set([...aliases.filter(alias => alias === name || !characters.some(other => other[0] === alias)), name])] }));
+specialSymbols.push(
+  { name: 'Integral', aliases: ['intt', 'int', 'integral'], symbol: '∫', literal: '∫[]' , template: '\\int {#0}\\,\\mathrm{d}\\,{#1}' },
+  { name: 'DefiniteIntegral', aliases: ['dint', 'defint'], symbol: '∫ₐᵇ', literal: '∫[]' , template: '\\int_{#0}^{#1}{#2}\\,\\mathrm{d}\\,{#3}' },
+  { name: 'Sum', aliases: ['sum'], symbol: '∑', literal: '∑[]', template: '\\sum_{#0=#1}^{#2}{#3}' },
+  { name: 'Product', aliases: ['prod'], symbol: '∏', literal: '∏[]', template: '\\prod_{#0=#1}^{#2}{#3}' },
+  { name: 'Sqrt', aliases: ['sqrt', 'sq'], symbol: '√', literal: '√[]', template: '\\sqrt{#0}' },
+  { name: 'Fraction', aliases: ['frac'], symbol: '⅟', template: '\\frac{#0}{#1}' },
+  { name: 'Superscript', aliases: ['sup'], template: '{#0}^{#1}' },
+  { name: 'Subscript', aliases: ['sub'], template: '{#0}_{#1}' },
+  { name: 'Limit', aliases: ['lim'], template: '\\lim_{#0\\to #1}{#2}' },
+  { name: 'Matrix2', aliases: ['mat', 'matrix', 'm2'], symbol: '▦', template: '\\begin{pmatrix}#0&#1\\\\#2&#3\\end{pmatrix}' },
+  { name: 'Vector2', aliases: ['vec', 'v2'], symbol: '↗', template: '\\begin{pmatrix}#0\\\\#1\\end{pmatrix}' },
+  { name: 'AbsoluteValue', aliases: ['abs'], symbol: '|x|', template: '\\left|#0\\right|' },
+  { name: 'Conjugate', aliases: ['conj', 'bar'], symbol: 'z̄', template: '\\overline{#0}' },
+  { name: 'NthRoot', aliases: ['root'], symbol: 'ⁿ√', template: '\\sqrt[#0]{#1}' },
+  { name: 'PartialD', aliases: ['dd', 'partial', 'pd'], symbol: '∂' },
+  { name: 'PartialDerivative', aliases: ['pdiff'], symbol: '∂ₓ', template: '\\partial_{#0}\\left(#1\\right)' },
+  { name: 'Nabla', aliases: ['del', 'nabla'], symbol: '∇' },
+  { name: 'DifferentialD', aliases: ['ddt', 'differentiald'], symbol: 'ⅆ' },
+  { name: 'Element', aliases: ['in', 'element'], symbol: '∈' },
+  { name: 'NotElement', aliases: ['notin'], symbol: '∉' },
+  { name: 'Subset', aliases: ['subset'], symbol: '⊂' },
+  { name: 'SubsetEqual', aliases: ['subseteq'], symbol: '⊆' },
+  { name: 'Superset', aliases: ['supset'], symbol: '⊃' },
+  { name: 'SupersetEqual', aliases: ['supseteq'], symbol: '⊇' },
+  { name: 'Union', aliases: ['union'], symbol: '∪' },
+  { name: 'Intersection', aliases: ['intersect'], symbol: '∩' },
+  { name: 'ForAll', aliases: ['forall'], symbol: '∀' },
+  { name: 'Exists', aliases: ['exists'], symbol: '∃' },
+  { name: 'Therefore', aliases: ['therefore'], symbol: '∴' },
+  { name: 'Proportional', aliases: ['prop'], symbol: '∝' },
+  { name: 'Congruent', aliases: ['equiv'], symbol: '≡' },
+  { name: 'Approximate', aliases: ['approx'], symbol: '≈' },
+  { name: 'Parallel', aliases: ['parallel'], symbol: '∥' },
+  { name: 'Perpendicular', aliases: ['perp'], symbol: '⊥' },
+  { name: 'Script', aliases: ['sc'], symbol: '𝒜', template: '\\mathcal{#0}' },
+  { name: 'ComplexNumbers', aliases: ['complex'], symbol: 'ℂ' },
+  { name: 'DoubleStruckN', aliases: ['sn', 'natural'], symbol: 'ℕ' },
+  { name: 'RationalNumbers', aliases: ['rational'], symbol: 'ℚ' },
+  { name: 'DoubleStruckR', aliases: ['sr', 'real'], symbol: 'ℝ' },
+  { name: 'DoubleStruckZ', aliases: ['sz', 'integer'], symbol: 'ℤ' },
+);
+export function findSpecialSymbol(alias: string) {
+  return specialSymbols.find(item => item.template && item.aliases.includes(alias)) || specialSymbols.find(item => item.aliases.includes(alias));
+}

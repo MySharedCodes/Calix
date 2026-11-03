@@ -1,0 +1,12 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "三维曲面",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nPlot3D[Sin[x] Cos[y],{x,-Pi,Pi},{y,-Pi,Pi}]"
+    }
+  ]
+}

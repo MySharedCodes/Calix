@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "偏微分方程数值解",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nClear[u,x,y];\nv=NDSolveValue[{Laplacian[u[x,y],{x,y}]==-2*Pi^2*Sin[Pi*x]*Sin[Pi*y],u[0,y]==0,u[1,y]==0,u[x,0]==0,u[x,1]==0},u[x,y],{x,0,1},{y,0,1}];\nPDEValue[v,{1/2,1/2}]\nPDEPlot[v,\"Solution\"]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nClear[u,x,t];\nv=NDSolveValue[{D[u[x,t],t]==D[u[x,t],{x,2}],u[0,t]==0,u[1,t]==0,u[x,0]==Sin[Pi*x]},u[x,t],{x,0,1},{t,0,1}];\nPDEValue[v,{1/2,1/10}]\nPDEPlot[v,\"Solution\"]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nClear[u,x,y];\nNDEigensystem[-Laplacian[u[x,y],{x,y}],u[x,y],{x,0,1},{y,0,1},5]"
+    }
+  ]
+}

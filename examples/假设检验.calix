@@ -1,0 +1,17 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "假设检验",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nd={98,101,99,103,100,102,97,104};\nMean[d]\nStandardDeviation[d]\nTTest[d,100]\nZTest[d,100,3]\nHistogram[d,4]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nd={11,12,9,14,13,10,15,12};\nMean[d]\nTTest[d,10]\nZTest[d,10,2]\nListPlot[d]"
+    }
+  ]
+}

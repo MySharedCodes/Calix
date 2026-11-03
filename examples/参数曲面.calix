@@ -1,0 +1,12 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "参数曲面",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nParametricPlot3D[{(2+Cos[v]) Cos[u],(2+Cos[v]) Sin[u],Sin[v]},{u,0,2 Pi},{v,0,2 Pi}]"
+    }
+  ]
+}

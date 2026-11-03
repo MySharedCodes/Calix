@@ -1,0 +1,12 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "二维参数曲线",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nParametricPlot[{Cos[3 t],Sin[2 t]},{t,0,2 Pi}]"
+    }
+  ]
+}

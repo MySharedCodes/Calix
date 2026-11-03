@@ -1,0 +1,38 @@
+{
+  "title": "机翼：稳态流场与湍流闭合",
+  "component": "pde",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# 机翼：稳态流场与湍流闭合\n\n## 翼型与网格\n\n取 NACA 0012 翼型的二维剖面。以弦长 $c$、来流速度 $U$ 和密度 $\\rho$ 无量纲化，雷诺数 $Re=20000$，攻角 $\\alpha=2^\\circ$。假定流动不可压缩、定常且附着。\n\n\n$$\ny=\\pm0.6\\left(0.2969\\sqrt{x}-0.1260x-0.3516x^2+0.2843x^3-0.1036x^4\\right),\\qquad0\\le x\\le1.\n$$\n\n\n远场边界为圆心 $(0.5,0)$、半径 6 的圆。四边形网格沿翼面闭合，径向按几何级数分布。第一个边界标记为翼面，第二个为远场。网格的节点和连接关系在下面生成。",
+      "id": "case-18-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[x,y,u,v,p,n,j,k,a,b,c,d,e,f,g,h,m,r,s,η,α];\nn=8;a=16*n;b=2*n+12;r=20000;α=2°;\nc=Table[x=(1+Cos[N[2*Pi*j/a]])/2;\n {x,Sign[Sin[N[2*Pi*j/a]]]*3/5*(2969/10000*Sqrt[x]-126/1000*x-3516/10000*x^2+2843/10000*x^3-1036/10000*x^4)},{j,0,a-1}];\nd=Table[{1/2+6*Cos[N[2*Pi*j/a]],6*Sin[N[2*Pi*j/a]]},{j,0,a-1}];\ne=Join[{0},Table[N[15/10000]^((b-1-j)/(b-2)),{j,1,b-1}]];\nf=N[Flatten[Table[Table[(1-Part[e,k])*Part[c,j,i]+Part[e,k]*Part[d,j,i],{i,1,2}],{k,1,b},{j,1,a}],1]];\ng=Flatten[Table[{k*a+j+1,k*a+Mod[j+1,a]+1,(k+1)*a+Mod[j+1,a]+1,(k+1)*a+j+1},{k,0,b-2},{j,0,a-1}],1];\nh=Join[Table[{j+1,Mod[j+1,a]+1},{j,0,a-1}],Table[{(b-1)*a+j+1,(b-1)*a+Mod[j+1,a]+1},{j,0,a-1}]];\nm=ToElementMesh[\"Coordinates\"->f,\"MeshElements\"->{QuadElement[g]},\"BoundaryElements\"->{LineElement[h,Join[ConstantArray[1,a],ConstantArray[2,a]]]}];\nLabeled[{Length[f],Length[g]},\"mesh nodes and quadrilaterals\"]\nLabeled[m[\"Wireframe\"],\"body-fitted mesh\"]",
+      "id": "case-18-1"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 方程与边界条件\n\n平均速度 $\\boldsymbol u=(u,v)$ 和压力 $p$ 满足\n\n\n$$\n\\nabla\\cdot\\boldsymbol u=0,\\qquad(\\boldsymbol u\\cdot\\nabla)\\boldsymbol u=-\\nabla p+\\nabla\\cdot\\left[2\\eta\\boldsymbol S\\right],\\qquad \\boldsymbol S=\\tfrac12(\\nabla\\boldsymbol u+\\nabla\\boldsymbol u^{\\mathsf T}).\n$$\n\n\n黏度取分子黏度与 Prandtl 混合长度涡黏度之和，近壁采用 van Driest 阻尼：\n\n\n$$\n\\eta=Re^{-1}+\\ell_m^2\\sqrt{2\\boldsymbol S:\\boldsymbol S},\\qquad\\ell_m=\\min(0.41d,0.09)\\left(1-e^{-y^+/26}\\right),\n$$\n\n\n$$\ny^+=d\\sqrt{Re\\sqrt{2\\boldsymbol S:\\boldsymbol S}}.\n$$\n\n\n$d$ 为到翼面的距离。翼面无滑移；远场速度为 $(\\cos\\alpha,\\sin\\alpha)$，远场最右节点固定 $p=0$。代码中直接给出黏度表达式、方程和边界条件。速度采用二次、压力采用一次四边形单元。",
+      "id": "case-18-2"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[x,y,u,v,p];\nd=RegionDistance[Polygon[N[c]],{x,y}];\ns=Sqrt[2*D[u[x,y],x]^2+2*D[v[x,y],y]^2+(D[u[x,y],y]+D[v[x,y],x])^2];\nη=1/r+Min[41/100*d,9/100]^2*(1-Exp[-d*Sqrt[r*s]/26])^2*s;\nh=FluidFlowPDEComponent[{{u[x,y],v[x,y],p[x,y]},{x,y}},Association[\"MassDensity\"->1,\"DynamicViscosity\"->η]];\ng=NDSolveValue[{h=={0,0,0},\n DirichletCondition[u[x,y]==0,ElementMarker==1],\n DirichletCondition[v[x,y]==0,ElementMarker==1],\n DirichletCondition[u[x,y]==Cos[α],ElementMarker==2],\n DirichletCondition[v[x,y]==Sin[α],ElementMarker==2],\n DirichletCondition[p[x,y]==0,x==13/2&&y==0]},\n {u,v,p},Element[{x,y},m]];\nu=Part[g,1];v=Part[g,2];p=Part[g,3];\nLabeled[{u,v,p},\"velocity and pressure interpolants\"]",
+      "id": "case-18-3"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 流场\n\n速度云图中叠加流线，另绘压力系数 $C_p=2p$。翼型内部留白，流线由求得的速度场积分得到。\n\n混合长度闭合没有独立的湍流输运方程，不预测自然转捩、失速或分离。修改首个单元的 $n$ 可细化网格；比较不同网格的翼面压力分布后，再讨论离散误差。",
+      "id": "case-18-4"
+    },
+    {
+      "mode": "source",
+      "code": "Labeled[Show[\n DensityPlot[Sqrt[u[x,y]^2+v[x,y]^2],{x,-3/5,2},{y,-7/10,7/10},PlotPoints->141],\n StreamPlot[{u[x,y],v[x,y]},{x,-3/5,2},{y,-7/10,7/10}]],\"speed |u|/U and streamlines\"]\nLabeled[DensityPlot[2*p[x,y],{x,-3/5,2},{y,-7/10,7/10},PlotPoints->141],\"pressure coefficient Cp\"]",
+      "id": "case-18-5"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

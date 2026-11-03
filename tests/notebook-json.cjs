@@ -1,0 +1,17 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const ts = require('typescript');
+const vm = require('node:vm');
+const source = fs.readFileSync('frontend/src/notebook-json.ts', 'utf8');
+const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+const exportsObject = {};
+vm.runInNewContext(compiled, { exports: exportsObject });
+const { parseNotebookJSON } = exportsObject;
+const notebook = { title: 'BOM notebook', cells: [{ code: 'inside\uFEFFtext' }] };
+const plain = JSON.stringify(notebook);
+assert.equal(JSON.stringify(parseNotebookJSON(plain)), plain);
+assert.equal(JSON.stringify(parseNotebookJSON('\uFEFF' + plain)), plain);
+assert.equal(parseNotebookJSON('\uFEFF' + plain).cells[0].code, 'inside\uFEFFtext');
+assert.throws(() => parseNotebookJSON('\uFEFF\uFEFF' + plain));
+assert.throws(() => parseNotebookJSON('\uFEFF{invalid}'));
+console.log('Notebook JSON: plain UTF-8, leading BOM, preserved body characters and invalid input verified');

@@ -1,0 +1,17 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "描述统计",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nd={72,81,85,85,90,94,98};\nMean[d]\nMedian[d]\nVariance[d]\nStandardDeviation[d]\nQuartiles[d]\nCounts[d]\nHistogram[d,5]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nd={12,15,18,18,19,21,24,28};\nMean[d]\nQuantile[d,{1/4,1/2,3/4}]\nInterquartileRange[d]\nSkewness[d]\nKurtosis[d]\nStandardize[d]\nHistogram[d,4]"
+    }
+  ]
+}

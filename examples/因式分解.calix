@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "因式分解",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nFactor[x^10-x^8-5*x^6+x^4+8*x^2+4]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nFactor[x^6-4*x^5*y+7*x^4*y^2-8*x^3*y^3+7*x^2*y^4-4*x*y^5+y^6]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nFactor[x^8+4*x^6+6*x^4+4*x^2+1]"
+    }
+  ]
+}

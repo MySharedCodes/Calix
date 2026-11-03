@@ -1,0 +1,27 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "概率分布",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\np=NormalDistribution[100,15];\nMean[p]\nVariance[p]\nN[CDF[p,115],10]\nN[InverseCDF[p,975/1000],10]\nPlot[PDF[p,x],{x,40,160}]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\np=BinomialDistribution[10,1/2];\nMean[p]\nVariance[p]\nPDF[p,5]\nCDF[p,5]\nListPlot[{{0,PDF[p,0]},{1,PDF[p,1]},{2,PDF[p,2]},{3,PDF[p,3]},{4,PDF[p,4]},{5,PDF[p,5]},{6,PDF[p,6]},{7,PDF[p,7]},{8,PDF[p,8]},{9,PDF[p,9]},{10,PDF[p,10]}}]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\np=ExponentialDistribution[1/5];\nMean[p]\nStandardDeviation[p]\nCDF[p,5]\nPlot[PDF[p,x],{x,0,25}]"
+    },
+    {
+      "id": "example-3",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\np=PoissonDistribution[3];\nMean[p]\nVariance[p]\nPDF[p,2]\nN[CDF[p,5],12]"
+    }
+  ]
+}

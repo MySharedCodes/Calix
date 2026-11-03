@@ -1,0 +1,17 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "05-animation",
+  "cells": [
+    {
+      "id": "trajectory",
+      "mode": "source",
+      "code": "Animate[ParametricPlot[{Cos[t],Sin[t]},{t,0,2 Pi}]]"
+    },
+    {
+      "id": "frames",
+      "mode": "source",
+      "code": "Animate[Plot[Sin[x-a],{x,-Pi,Pi}],{a,0,2 Pi}]"
+    }
+  ]
+}

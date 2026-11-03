@@ -1,0 +1,27 @@
+{
+  "title": "高考物理：2016 全国Ⅲ卷第25题最后一问",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# 高考物理：2016 全国Ⅲ卷第25题最后一问\n\n两条间距为 $l$ 的光滑水平导轨左端接电阻 $R$，导体棒与导轨电阻忽略。固定面积 $S$ 内的磁场为 $B_1=kt$；右侧磁场为 $B_0$，两者均向纸内。棒在 $t_0$ 时以速度 $v_0$ 越过右侧磁场边界，此后匀速。求 $t>t_0$ 时的总磁通量和所加恒力。取向纸内为磁通正方向。\n## 符号输入与输出\n\n输入中，S 表示固定磁场区域的面积，k 是该区域磁感应强度随时间的变化率；B₀、ℓ、v₀、t₀、R 分别对应 $B_0,l,v_0,t_0,R$，t 是时刻，τ 是积分变量。\n\nIn[1] 依次输出棒进入右侧磁场后扫过的面积 S₁、总磁通量 Φ、电动势大小 ε₁、电流大小 j₀、维持匀速所需的外力大小 F。参数取正，外力方向沿棒的运动方向。",
+      "id": "case-6-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[k,S,B₀,ℓ,v₀,t₀,R,t,τ];\nS₁=ℓ*Integrate[v₀,{τ,t₀,t}];\nΦ=k*t*S+B₀*S₁;\nε₁=D[Φ,t];\nj₀=ε₁/R;\nF=Simplify[B₀*ℓ*j₀];\nColumn[{\n  Labeled[S₁, \"swept area\"],\n  Labeled[Φ, \"magnetic flux\"],\n  Labeled[ε₁, \"induced EMF\"],\n  Labeled[j₀, \"current\"],\n  Labeled[F, \"required external force\"]\n}]",
+      "id": "case-6-1"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 量纲与参数计算\n\n取 $B_0=1$ T、$l=0.5$ m、$v_0=2$ m/s、$k=0.2$ T/s、$S=0.3$ m²、$R=2$ Ω、$t_0=1$ s。\n\nIn[2] 先将外力表达式的组合单位化简，再输出外力的数值（单位 N），最后绘制总磁通量随时间的曲线（横轴为秒，纵轴为 Wb）。q₀ 将这些参数值代入符号结果。",
+      "id": "case-6-2"
+    },
+    {
+      "mode": "source",
+      "code": "q₀={B₀->1,ℓ->1/2,v₀->2,k->1/5,S->3/10,R->2,t₀->1};\nColumn[{\n  Labeled[UnitSimplify[\"T^2*m^3/(s*ohm)\"], \"force unit\"],\n  Labeled[ReplaceAll[F,q₀][N], \"external force [N]\"],\n  Labeled[Plot[ReplaceAll[Φ,q₀],{t,1,4}], \"magnetic flux versus time [Wb]\"]\n}]",
+      "id": "case-6-3"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

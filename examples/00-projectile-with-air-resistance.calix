@@ -1,0 +1,67 @@
+{
+  "title": "空气阻力下的二维抛体运动",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# 空气阻力下的二维抛体运动\n\n小明从平地上抛出一块质量为 $650\\,\\mathrm{gr}$ 的石头，初速度为 $890\\,\\mathrm{m/s}$。改变投射角，测得最大射程为 $7\\,\\mathrm{km}$。将石头视为质点，落地点与出发点等高，重力加速度取 $9.81\\,\\mathrm{m/s^2}$。\n\n分别用线性阻力和速度平方阻力拟合最大射程，求阻力系数、最佳投射角和飞行时间。取 $x$ 水平向前、$y$ 竖直向上。\n\n忽略风、地球曲率和空气密度变化，阻力系数取常数。",
+      "id": "physics-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[m,v,g,R,b,c,k,t,θ,u,r,p,q];\n      m=650[gr];v=890[m/s];g=9.81[m/s^2];R=7[km];\n      Labeled[m,\"stone mass, grain\"]\n      Labeled[v,\"initial speed\"]\n      Labeled[R,\"observed maximum range\"]",
+      "id": "physics-1"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 第一部分：线性空气阻力（解析解）\n\n阻力为 $\\boldsymbol F_\\mathrm d=-b\\boldsymbol v$，运动方程为\n\n\n$$\nm\\dot v_x=-bv_x,\\qquad m\\dot v_y=-mg-bv_y,\\qquad\n(v_x(0),v_y(0))=v_0(\\cos\\theta,\\sin\\theta).\n$$\n\n\n对每个 $b$ 求最大射程，再用 NSolve 确定使最大射程等于 $7\\,\\mathrm{km}$ 的系数。代码以 $k\\,[\\mathrm{kg/s}]$ 表示 $b$。",
+      "id": "physics-2"
+    },
+    {
+      "mode": "source",
+      "code": "p=NSolve[ProjectileMaxRange[k*1[kg/s],m,v,g,\"Linear\"]==R,{k,0,1/10}];\n      b=ReplaceAll[k,First[p]]*1[kg/s];\n      q=ProjectileOptimum[b,m,v,g,\"Linear\"];\n      Labeled[b,\"linear drag coefficient b\"]\n      Labeled[q,\"linear drag: {maximum range, optimal angle, landing time}\"]\n      Labeled[UnitConvert[Part[q,1]-R,\"m\"],\"maximum-range calibration residual\"]",
+      "id": "physics-3"
+    },
+    {
+      "mode": "markdown",
+      "code": "### 速度、位移与时间曲线\n\n最佳角度记作 $\\theta$，令 $\\beta=b/m$，线性模型的速度解析式为\n\n\n$$\nv_x=v_0\\cos\\theta\\,e^{-\\beta t},\\qquad\nv_y=(v_0\\sin\\theta+g/\\beta)e^{-\\beta t}-g/\\beta.\n$$\n\n\n将速度积分得到位移，计算到落地时刻。",
+      "id": "physics-4"
+    },
+    {
+      "mode": "source",
+      "code": "θ=Part[q,2];\n      u=ProjectileVelocity[b,m,v,g,θ,{t,0[s],Part[q,3]},\"Linear\"];\n      r=Integrate[u,{t,0[s],t*1[s]}];\n      Labeled[u,\"linear drag velocity, {vx,vy}\"]\n      Labeled[r,\"linear drag displacement, {x,y}\"]\n      Labeled[Plot[Part[r,1],{t,0[s],Part[q,3]}],\"linear drag horizontal displacement versus time\"]\n      Labeled[Plot[Part[r,2],{t,0[s],Part[q,3]}],\"linear drag vertical displacement versus time\"]",
+      "id": "physics-5"
+    },
+    {
+      "mode": "source",
+      "code": "Labeled[Animate[ParametricPlot[r,{t,0[s],Part[q,3]}]],\"linear drag flight to landing\"]",
+      "id": "physics-6"
+    },
+    {
+      "mode": "markdown",
+      "code": "## 第二部分：普通空气阻力（数值解）\n\n采用速度平方阻力 $\\boldsymbol F_\\mathrm d=-c|\\boldsymbol v|\\boldsymbol v$：\n\n\n$$\nm\\dot v_x=-c\\sqrt{v_x^2+v_y^2}\\,v_x,\\qquad\nm\\dot v_y=-mg-c\\sqrt{v_x^2+v_y^2}\\,v_y.\n$$\n\n\n数值积分这组方程，搜索最佳投射角，再用 NSolve 匹配最大射程。此时 $c=k\\,[\\mathrm{kg/m}]$。",
+      "id": "physics-7"
+    },
+    {
+      "mode": "source",
+      "code": "p=NSolve[ProjectileMaxRange[k*1[kg/m],m,v,g,\"Quadratic\"]==R,{k,0,1/1000}];\n      c=ReplaceAll[k,First[p]]*1[kg/m];\n      q=ProjectileOptimum[c,m,v,g,\"Quadratic\"];\n      Labeled[c,\"quadratic drag coefficient c\"]\n      Labeled[q,\"quadratic drag: {maximum range, optimal angle, landing time}\"]\n      Labeled[UnitConvert[Part[q,1]-R,\"m\"],\"maximum-range calibration residual\"]\n      Labeled[Plot[ProjectileRange[c,m,v,g,θ,\"Quadratic\"],{θ,0°,90°}],\"quadratic drag range versus launch angle [rad]\"]",
+      "id": "physics-8"
+    },
+    {
+      "mode": "markdown",
+      "code": "### 运动轨迹\n\n取拟合后的阻力系数和最佳投射角，求速度、位移及落地前的轨迹。",
+      "id": "physics-9"
+    },
+    {
+      "mode": "source",
+      "code": "θ=Part[q,2];\n      u=ProjectileVelocity[c,m,v,g,θ,{t,0[s],Part[q,3]},\"Quadratic\"];\n      r=Integrate[u,{t,0[s],t*1[s]}];\n      Labeled[u,\"quadratic drag velocity, {vx,vy}\"]\n      Labeled[r,\"quadratic drag displacement, {x,y}\"]\n      Labeled[Plot[Part[r,1],{t,0[s],Part[q,3]}],\"quadratic drag horizontal displacement versus time\"]\n      Labeled[Plot[Part[r,2],{t,0[s],Part[q,3]}],\"quadratic drag vertical displacement versus time\"]",
+      "id": "physics-10"
+    },
+    {
+      "mode": "source",
+      "code": "Labeled[Animate[ParametricPlot[r,{t,0[s],Part[q,3]}]],\"quadratic drag flight to landing\"]",
+      "id": "physics-11"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

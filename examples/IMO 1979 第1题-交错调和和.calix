@@ -1,0 +1,17 @@
+{
+  "title": "IMO 1979 第1题：交错调和和",
+  "cells": [
+    {
+      "mode": "markdown",
+      "code": "# IMO 1979 第1题：交错调和和\n\n将 $1-\\frac12+\\frac13-\\frac14+\\cdots-\\frac1{1318}+\\frac1{1319}$ 写成既约分数 $p/q$，检验 $p$ 是否能被 $1979$ 整除。\n\n## 精确有理数计算\n\n依次输出和的数值近似、分子和分母的十进制位数、最大公因数、分子及分母除以 1979 的余数，以及分子除以 1979 的精确商。",
+      "id": "case-8-0"
+    },
+    {
+      "mode": "source",
+      "code": "Clear[k,p,q];\nt₂=Sum[(-1)^(k+1)/k,{k,1,1319}];\np=Numerator[t₂]; q=Denominator[t₂];\nColumn[{\n  Labeled[N[t₂,30], \"alternating harmonic sum, 30 digits\"],\n  Labeled[{IntegerLength[p],IntegerLength[q]}, \"decimal digits, {numerator,denominator}\"],\n  Labeled[GCD[p,q], \"GCD of numerator and denominator\"],\n  Labeled[{Mod[p,1979],Mod[q,1979]}, \"remainders modulo 1979, {numerator,denominator}\"],\n  Labeled[p/1979, \"exact numerator / 1979\"]\n}]",
+      "id": "case-8-1"
+    }
+  ],
+  "format": "calix-notebook",
+  "version": 1
+}

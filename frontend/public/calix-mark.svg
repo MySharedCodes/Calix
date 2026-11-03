@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Calix">
+  <rect x="1.5625" y="1.5625" width="96.875" height="96.875" rx="14.84375" fill="#087e80"/>
+  <g transform="translate(0 -10.86)">
+    <path transform="translate(2 3.5)" d="M78.56 55.04 A29 29 0 1 1 31.36 27.78" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+    <path d="M38.09 94.43 L50 50" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>

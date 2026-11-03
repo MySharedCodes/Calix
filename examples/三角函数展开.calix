@@ -1,0 +1,22 @@
+{
+  "format": "calix-notebook",
+  "version": 1,
+  "title": "三角函数展开",
+  "cells": [
+    {
+      "id": "example-0",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nSimplify[TrigExpand[Sin[3*x]*Cos[2*x]-Cos[3*x]*Sin[2*x]]]"
+    },
+    {
+      "id": "example-1",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nSimplify[TrigExpand[Cos[x+y]*Cos[x-y]+Sin[x+y]*Sin[x-y]]]"
+    },
+    {
+      "id": "example-2",
+      "mode": "source",
+      "code": "Clear[a,r,f,v,x,y,t,n];\nTrigExpand[Sin[2*x+2*y]]"
+    }
+  ]
+}

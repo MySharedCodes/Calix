@@ -1,0 +1,27 @@
+Intel Runtime Components In Calix
+
+The optional PDE module contains unmodified CPU-only runtime binaries from
+oneMKL 2025.3.1 and Intel OpenMP 2025.3.3. These are distributed only as part of
+Calix. Their complete licenses and third-party notices are supplied alongside
+the runtime under components/pde/native/licenses and in the installed notices.
+
+The oneMKL binaries are governed by the Intel Simplified Software License
+(October 2022). The supplied Intel OpenMP runtime is governed by the Intel End
+User License Agreement for Developer Tools (August 2024), with its third-party
+exceptions. Use of these components is subject to those accompanying terms.
+Reverse engineering, decompilation and disassembly of the Intel proprietary
+redistributables are prohibited by their licenses. Preserve their notices.
+
+The limitations of Intel liability in Section 7 of the accompanying Intel
+OpenMP license apply to recipients of that runtime. That section excludes the
+listed categories of losses and limits Intel's total cumulative liability to
+USD 100. The full text, including the other applicable conditions, governs.
+
+These terms apply to the specified Intel components. They do not restrict
+separate rights granted for other third-party components, including files
+governed by MPL, BSD, Apache or other applicable open-source licenses.
+
+Calix is not certified by Intel, and no Intel guarantee of its performance
+or correctness is implied. The current application runs locally; this license
+selection does not authorize turning the Intel OpenMP runtime into a SaaS or
+service-bureau offering under different deployment terms.

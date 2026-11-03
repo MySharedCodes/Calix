@@ -1,0 +1,39 @@
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: var(--page);
+  box-shadow: 0 5px 9px #26333c08;
+}
+.cell { scroll-margin-top: 110px; }
+.document-title { flex: 1; }
+.document-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.group-item + .group-item { margin-top: 14px; padding-top: 8px; border-top: 1px solid #e3eaed; }
+.animation-controls {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 8px;
+  background: #edf3f4;
+  min-height: 51px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #526d77;
+}
+.animation-controls input[type="range"] { flex: 1; min-width: 80px; accent-color: var(--accent); }
+.animation-controls output { min-width: 100px; font-variant-numeric: tabular-nums; }
+.animation-controls select { border: 1px solid #ccdadd; background: var(--surface); border-radius: 4px; padding: 4px; color: inherit; }
+.animation-controls label { display: flex; align-items: center; gap: 4px; }
+.animation-controls input[type="checkbox"] { accent-color: var(--accent); }
+@media (max-width: 760px) {
+  .notebook-header { flex-wrap: wrap; }
+  .document-title { flex-basis: 100%; }
+  .document-actions { margin-left: auto; }
+  .toolbar { display: block; padding: 0; }
+  .toolbar-group { column-gap: 3px; padding: 6px 0; }
+  .toolbar-separator { flex-basis: 100%; height: 0; width: 100%; margin: 0; }
+  .notebook-controls { position: absolute; right: 0; top: 8px; }
+  .toolbar .subtle-button { gap: 4px; }
+  .animation-controls { gap: 5px; }
+  .animation-controls output { min-width: 90px; font-size: 11px; }
+}

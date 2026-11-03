@@ -1,0 +1,25 @@
+name: UI or installation problem
+description: Report an interface, file, installation or startup problem.
+labels: [bug]
+body:
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Calix version, Windows version, optional components and Workers.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include exact actions and whether this is a fresh session. Remove private data and API tokens.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Actual and expected behavior
+      description: Paste the complete error. Attach a screenshot for layout problems.
+    validations:
+      required: true
