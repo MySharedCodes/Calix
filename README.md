@@ -51,7 +51,7 @@ The tested desktop target is **Windows x64** with Microsoft Edge WebView2.
 The packaged app includes Python and its service; no Python, Node.js or
 Mathematica installation is required for end users.
 
-For a distribution obtained from the maintainer, run `Calix_0.1.27_x64-setup.exe`.
+For a distribution obtained from the maintainer, run `Calix_0.1.28_x64-setup.exe`.
 A source checkout can generate it under `release/`. Choose **PDE module**,
 additional languages and themes as needed. A portable distribution must retain
 its adjacent runtime directories. See [installation](docs/INSTALLATION.md).
@@ -105,6 +105,8 @@ examples, translations and reports from other Windows machines.
 
 See the [roadmap](docs/ROADMAP.md) for priorities and
 [release preparation](docs/RELEASING.md) for the public-launch checklist.
+The [acceptance record](docs/ACCEPTANCE.md) distinguishes automated checks from
+clean-machine and external-user validation that still needs to be performed.
 
 ## Help
 
@@ -114,6 +116,6 @@ See the [roadmap](docs/ROADMAP.md) for priorities and
 - [Troubleshooting / 故障排查](docs/TROUBLESHOOTING.md)
 - [CPU execution and precision](docs/CPU-ACCELERATION.md)
 - [Third-party licensing](docs/LICENSE-REVIEW.md)
-- [Latest changes](docs/CHANGES-0.1.27.md)
+- [Latest changes](docs/CHANGES-0.1.28.md)
 
-Version **0.1.27**, engineering preview.
+Version **0.1.28**, engineering preview.

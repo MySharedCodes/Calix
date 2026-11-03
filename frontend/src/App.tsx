@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BookOpen, Calculator, Plus, Play, Square, RotateCcw, FolderOpen, Save, SaveAll, ChevronDown, Trash2, Copy, ArrowDownToLine, ArrowUp, ArrowDown, Check, X, PanelLeftClose, PanelLeftOpen, Sigma, FunctionSquare, Settings2, FilePlus2, LoaderCircle } from 'lucide-react';
+import { BookOpen, Calculator, Plus, Play, Square, RotateCcw, FolderOpen, Save, SaveAll, ChevronDown, Trash2, Copy, ArrowDownToLine, ArrowUp, ArrowDown, Check, X, PanelLeftClose, PanelLeftOpen, Sigma, FunctionSquare, Settings2, FilePlus2, LoaderCircle, Undo2, Redo2, History } from 'lucide-react';
 import katex from 'katex';
 import { Editor, assertCompleteInput } from './Editor';
 import { Plot } from './Plot';
@@ -22,8 +22,10 @@ import { savePreference } from './preferences';
 import { t, useLanguage, setLanguage, availableLanguages, installTranslations, restrictLanguage, type Language } from './i18n';
 import { themeOptions, applyTheme, type Theme } from './themes';
 import './help.css';
+import './recovery.css';
 
 const Help = lazy(() => import('./Help'));
+const Recovery = lazy(() => import('./Recovery'));
 
 const makeCell = (code = '', mode: Cell['mode'] = 'source'): Cell => ({ id: crypto.randomUUID(), code, mode });
 const initialCells = () => starter.cells.map(cell => makeCell(cell.code, cell.mode as Cell['mode']));
@@ -54,6 +56,10 @@ function validateResult(value: unknown, depth = 0): Result | undefined {
   if (depth > 4) return undefined;
   if (!value || typeof value !== 'object') return undefined;
   const result = { ...value } as Result;
+  if (result.kind === 'expression') {
+    if (!['evaluated', 'symbolic', 'unevaluated'].includes(result.evaluation_status || '')) delete result.evaluation_status;
+    if (!Array.isArray(result.symbolic_functions) || result.symbolic_functions.length > 32 || result.symbolic_functions.some(name => typeof name !== 'string' || name.length > 100)) delete result.symbolic_functions;
+  }
   const execution = result.execution;
   if (execution && (!Number.isInteger(execution.thread_limit) || execution.thread_limit < 1 || !Number.isInteger(execution.threads_used) || execution.threads_used < 1 || !execution.operations || typeof execution.operations !== 'object' || Array.isArray(execution.operations) || Object.keys(execution.operations).length > 32 || Object.values(execution.operations).some(operation => !operation || typeof operation.path !== 'string' || operation.path.length > 200 || !Number.isInteger(operation.calls) || operation.calls < 1 || !Number.isInteger(operation.threads_used) || operation.threads_used < 1))) delete result.execution;
   if (typeof result.engine !== 'string' || result.engine.length > 200 || typeof result.elapsed_ms !== 'number' || !Number.isFinite(result.elapsed_ms)) return undefined;
@@ -117,6 +123,7 @@ export function Output({ result, onInsert }: { result: Result; onInsert?: (text:
   if (result.kind === 'animation') return <><Animation result={result} /><div className="result-meta"><span>{result.engine}</span><span>{result.elapsed_ms.toFixed(1)} ms</span></div></>;
   return <>
     {result.kind === 'plot' ? (result.plot_type==='field3d'?<FieldScene result={result}/>:['volume','geometry3d'].includes(result.plot_type) ? <ScientificScene result={result} /> : <Plot result={result} />) : <div className="expression-output"><Formula latex={result.latex} /><div className="output-actions"><button className="icon-button" title={t("复制结果")} onClick={async () => { await navigator.clipboard.writeText(result.text); setCopied(true); setTimeout(() => setCopied(false), 1200); }}>{copied ? <Check size={15} /> : <Copy size={15} />}</button>{onInsert && <button className="icon-button" title={t('复制到下一行输入')} onClick={() => onInsert(result.text)}><ArrowDownToLine size={15}/></button>}</div>{result.unresolved && <span className="unresolved">{t("保留符号形式")}</span>}</div>}
+    {result.kind === 'expression' && result.evaluation_status === 'symbolic' && <div className="unresolved">{t('含未求值函数')}: {result.symbolic_functions?.join(', ')}</div>}
     <div className="result-meta"><span>{result.engine}</span><span>{result.elapsed_ms < 1000 ? `${result.elapsed_ms.toFixed(1)} ms` : `${(result.elapsed_ms / 1000).toFixed(2)} s`}</span></div><ExecutionInfo result={result}/>
   </>;
 }
@@ -150,6 +157,7 @@ export default function App() {
   const [library, setLibrary] = useState(false);
   const [settings, setSettings] = useState(false);
   const [help, setHelp] = useState(false);
+  const [recovery, setRecovery] = useState(false);
   const [theme, setTheme] = useState<Theme>('white');
   const [digits, setDigits] = useState(() => Math.min(1000, Math.max(2, Number(localStorage.getItem('calix-digits')) || 16)));
   const [workers, setWorkers] = useState(1);
@@ -438,7 +446,7 @@ export default function App() {
         onDelete={removeNotebook} onReveal={doc => void revealNotebook(doc)} />
       <div className="sidebar-divider" />
       <button className={`library-button ${library ? 'selected' : ''}`} onClick={() => setLibrary(!library)}><FunctionSquare size={18} /><span>{t("计算示例")}</span><ChevronDown className={library ? 'rotated' : ''} size={15} /></button>
-      <div className="sidebar-bottom"><button onClick={() => setHelp(true)} title="F1"><BookOpen size={17} />{t('帮助')}</button><button onClick={() => setSettings(true)}><Settings2 size={17} />{t("偏好设置")}</button><div className="version">Calix <span>0.1.27 · Preview</span></div></div>
+      <div className="sidebar-bottom"><button onClick={() => setRecovery(true)} disabled={!!busy || calculatorBusy}><History size={17}/>{t('恢复历史')}</button><button onClick={() => setHelp(true)} title="F1"><BookOpen size={17} />{t('帮助')}</button><button onClick={() => setSettings(true)}><Settings2 size={17} />{t("偏好设置")}</button><div className="version">Calix <span>0.1.28 · Preview</span></div></div>
     </aside>
     <div className="main-shell">
       <header className="topbar"><div className="breadcrumb"><button className="icon-button" title={sidebar ? t("收起侧栏") : t("展开侧栏")} onClick={() => setSidebar(!sidebar)}>{sidebar ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}</button><span>{t("工作空间")}</span><span className="slash">/</span><strong>{mode === 'notebook' ? 'Notebook' : t("传统计算器面板")}</strong></div><div className={`engine-status ${status}`}><span className="status-dot" />{status === 'connecting' ? t("连接引擎") : status === 'error' ? t("引擎离线") : native ? t("原生核心就绪") : t("符号引擎就绪")}{status === 'error' && <button title={t("重新连接")} onClick={() => { setStatus('connecting'); api.connect().then(h => { setNative(h.native); setStatus('ready'); }).catch(e => { setStatus('error'); toast(String(e)); }); }}><RotateCcw size={14} /></button>}</div></header>
@@ -455,7 +463,7 @@ export default function App() {
               {cell.result && <div className={`output ${cell.stale ? 'stale' : ''}`}><div className="output-label">Out[{cell.executed ?? ' '}]= {cell.stale && <span>{t("待重新计算")}</span>}</div><Output result={cell.result} onInsert={text => insertOutput(cell.id, text)} /></div>}
             </div>
           </section>)}
-          <button className="add-cell" onClick={() => addCell()} title={t("添加计算单元")}><Plus size={18} /></button>
+          <div className="structure-history"><button className="icon-button" title={t('撤销单元操作')} disabled={!!busy || !workspace.canUndo} onClick={() => workspace.navigateHistory('undo')}><Undo2 size={17}/></button><button className="icon-button" title={t('重做单元操作')} disabled={!!busy || !workspace.canRedo} onClick={() => workspace.navigateHistory('redo')}><Redo2 size={17}/></button><button className="add-cell" onClick={() => addCell()} title={t("添加计算单元")}><Plus size={18} /></button></div>
         </main>
       </> : <CalculatorView ready={status === 'ready'} digits={digits} toast={toast} onBusyChange={setCalculatorBusy} />}
       <footer className="statusbar"><span><span className="tiny-dot" />{t("本地计算")}</span><span>{busy || calculatorBusy ? t("计算中") : t("就绪")}</span><span className="statusbar-right">{t(mode === 'notebook' ? 'Notebook' : 'Calculator')}<span>UTF-8</span></span></footer>
@@ -465,10 +473,15 @@ export default function App() {
       const value = Math.min(cpuCount, Math.max(1, Math.floor(Number(event.target.value) || 1)));
       setWorkersSaving(true);
       void api.configureWorkers(value).then(() => { setWorkers(value); savePreference('calix-workers', String(value)); }).catch(error => toast(String(error))).finally(() => setWorkersSaving(false));
-    }} /></label><label>{t('界面语言')}<select aria-label={t('界面语言')} value={language} onChange={event => setLanguage(event.target.value as Language)}>{availableLanguages().map(item => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><fieldset className="theme-picker"><legend>{t('页面皮肤')}</legend>{themeOptions.filter(item => components.themes || item.id === 'white').map(item => <button key={item.id} aria-label={t(item.name)} title={t(item.name)} aria-pressed={theme === item.id} onClick={() => { setTheme(item.id); applyTheme(item.id); }}><i style={{ background: item.color }}/></button>)}</fieldset><div className="settings-info"><span>{t("计算核心")}</span><strong>{native ? 'C++ / Boost + SymPy' : 'SymPy'}</strong></div><div className="settings-info"><span>{t("版本")}</span><strong>0.1.27 Preview</strong></div><div className="settings-info"><span>{t("许可证")}</span><strong>Proprietary · Third-party notices included</strong></div></section></div>}
+    }} /></label><label>{t('界面语言')}<select aria-label={t('界面语言')} value={language} onChange={event => setLanguage(event.target.value as Language)}>{availableLanguages().map(item => <option key={item.code} value={item.code}>{item.name}</option>)}</select></label><fieldset className="theme-picker"><legend>{t('页面皮肤')}</legend>{themeOptions.filter(item => components.themes || item.id === 'white').map(item => <button key={item.id} aria-label={t(item.name)} title={t(item.name)} aria-pressed={theme === item.id} onClick={() => { setTheme(item.id); applyTheme(item.id); }}><i style={{ background: item.color }}/></button>)}</fieldset><div className="settings-info"><span>{t("计算核心")}</span><strong>{native ? 'C++ / Boost + SymPy' : 'SymPy'}</strong></div><div className="settings-info"><span>{t("版本")}</span><strong>0.1.28 Preview</strong></div><div className="settings-info"><span>{t("许可证")}</span><strong>Proprietary · Third-party notices included</strong></div></section></div>}
     {help && <Suspense fallback={null}><Help onClose={() => setHelp(false)} onNotebook={async source => {
       if (busyRef.current || calculatorBusy || status !== 'ready') throw new Error(t('请先停止当前计算'));
       await loadContent(source);
+    }}/></Suspense>}
+    {recovery && <Suspense fallback={null}><Recovery filePath={workspace.current.path} onClose={() => setRecovery(false)} onRestore={value => {
+      if (busyRef.current || calculatorBusy) throw new Error(t('请先停止当前计算'));
+      const notebook = validateNotebook(value);
+      workspace.create({ ...notebook, title: notebook.title + t(' 恢复副本') }); setMode('notebook');
     }}/></Suspense>}
     {notice && <div className="toast" role="status">{notice}<button title={t("关闭通知")} onClick={() => setNotice('')}><X size={14} /></button></div>}
     <input ref={fileInput} type="file" accept=".cixnb,.clxnb,.calix,.json" hidden onChange={async e => { const file = e.target.files?.[0]; if (file) { try { if (file.size > 10_000_000) throw new Error(t("Notebook 文件超过 10 MB")); await loadContent(await file.text()); } catch (err) { toast(String(err)); } } e.target.value = ''; }} />

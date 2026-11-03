@@ -15,6 +15,11 @@ let language: Language = languages.find(item => item.code === savedLanguage)?.co
 document.documentElement.lang = language === 'zh' ? 'zh-CN' : language;
 const listeners = new Set<() => void>();
 export const translations: Record<string, string> = {
+  '含未求值函数': 'Contains unevaluated functions',
+  '恢复历史': 'Recovery history', '恢复版本': 'Recovery versions', '浏览器备份': 'Browser backup', '最近副本': 'Latest copy',
+  '选择恢复版本': 'Select a recovery version', '暂无恢复历史': 'No recovery history', '恢复数据无效': 'Invalid recovery data', ' 恢复副本': ' recovered copy',
+  '撤销单元操作': 'Undo cell operation', '重做单元操作': 'Redo cell operation', '笔记最多包含 200 个单元': 'A notebook can contain up to 200 cells',
+  '磁盘恢复副本写入失败，请将笔记保存到文件': 'Disk recovery copy failed. Save your notebooks to files.',
   '帮助': 'Help', '关闭帮助': 'Close help', '帮助目录': 'Help topics', '搜索帮助': 'Search help',
   '帮助正文': 'Help article', '没有匹配的文档': 'No matching articles', '文件位置': 'File location',
   '快速上手': 'Get started (中文)', '使用帮助': 'User guide (中文)', '故障排查': 'Troubleshooting (中文)',
@@ -59,7 +64,7 @@ export const translations: Record<string, string> = {
   '解析与符号计算': 'Analytical and symbolic calculations', '因式分解': 'Factorization', '有理式化简': 'Rational simplification', '级数展开': 'Series expansions', '三角函数展开': 'Trigonometric expansions', '复数化简': 'Complex simplification',
   'IMO 1981 第3题：整数约束下的最大值': 'IMO 1981 Problem 3: An integer-constrained maximum',
   'IPhO 2011 第3题：离子散射与俘获截面': 'IPhO 2011 Problem 3: Ion scattering and capture cross section',
-  '个单元': 'cells',
+  '个单元': 'cells', '文件历史': 'File history',
   '文件': 'File', '工作空间': 'Workspace', '新建笔记': 'New notebook', '打开': 'Open', '保存': 'Save', '另存为': 'Save as',
   '传统计算器面板': 'Calculator panel', '计算示例': 'Examples', '偏好设置': 'Preferences', '关闭设置': 'Close preferences',
   '笔记管理': 'Notebooks', '重命名笔记': 'Rename notebook', '复制笔记': 'Duplicate notebook', '移除笔记': 'Remove notebook',

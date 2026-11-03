@@ -17,6 +17,7 @@ for retired in ("IMO 1988 第6题-韦达跳跃.calix", "IMO 2009 第6题-蚱蜢�
 shutil.copytree(root / "docs", dest / "docs", dirs_exist_ok=True)
 shutil.copy2(root / "README.md", dest / "README.md")
 shutil.copy2(root / "LICENSE", dest / "LICENSE")
+shutil.copy2(root / "release/BUILD-INFO.json", dest / "BUILD-INFO.json")
 for name in ('calix.cmd', 'API.md', 'AGENTS.md', 'AI-CONTROL.md', 'README.zh-CN.md', 'CONTRIBUTING.md', 'SECURITY.md'):
     shutil.copy2(root / name, dest / name)
 shutil.copy2(root / 'native/build/Release/calix-cli.exe', dest / 'calix-cli.exe')

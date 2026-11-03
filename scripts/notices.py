@@ -62,14 +62,23 @@ if (runtime/'manifest.json').is_file():
     shutil.copy2(runtime/'manifest.json',DEST/'native/oneMKL-runtime-manifest.json')
 eigen_source = DEST / 'mpl-sources/eigen-3.4.0.zip'
 eigen_source.parent.mkdir(exist_ok=True)
-shutil.copy2(ROOT / 'work/eigen-3.4.0.zip', eigen_source)
+eigen_archive = Path(os.environ.get('CALIX_EIGEN_ARCHIVE', ROOT / 'work/eigen-3.4.0.zip'))
+if eigen_archive.is_file():
+    shutil.copy2(eigen_archive, eigen_source)
+elif not eigen_source.is_file():
+    raise FileNotFoundError('Eigen source archive is required; run bootstrap-native.ps1 or set CALIX_EIGEN_ARCHIVE')
 nsis_license = ROOT / "tools/nsis-unpacked/nsis-3.08/COPYING"
 if nsis_license.exists():
     write_component("installer", "NSIS", "3.08", "Zlib (installer uses zlib compression)", [nsis_license])
 
 cargo = ROOT / "tools/cargo/bin/cargo.exe"
+local_cargo = cargo.is_file()
+if not local_cargo:
+    cargo = Path(shutil.which('cargo') or 'cargo')
 if cargo.exists() and (ROOT / "src-tauri/Cargo.lock").exists():
-    env = dict(os.environ, CARGO_HOME=str(ROOT / "tools/cargo"), RUSTUP_HOME=str(ROOT / "tools/rustup"))
+    env = dict(os.environ)
+    if local_cargo:
+        env.update(CARGO_HOME=str(ROOT / "tools/cargo"), RUSTUP_HOME=str(ROOT / "tools/rustup"))
     env["PATH"] = str(cargo.parent) + os.pathsep + env.get("PATH", "")
     result = subprocess.run([str(cargo), "metadata", "--manifest-path", str(ROOT / "src-tauri/Cargo.toml"), "--format-version", "1", "--filter-platform", "x86_64-pc-windows-msvc", "--locked", "--offline"], capture_output=True, text=True, encoding="utf-8", env=env, check=True)
     for package in json.loads(result.stdout)["packages"]:
@@ -91,7 +100,8 @@ if cargo.exists() and (ROOT / "src-tauri/Cargo.lock").exists():
                 files = [ROOT / "docs/licenses/alloc-stdlib-LICENSE.txt"]
         write_component("cargo", package["name"], package["version"], package.get("license") or "REVIEW", files)
         if "MPL-2.0" in (package.get("license") or ""):
-            source = next((ROOT / "tools/cargo/registry/cache").glob(f"*/{package['name']}-{package['version']}.crate"))
+            cache = Path(env.get('CARGO_HOME', Path.home()/'.cargo')) / 'registry/cache'
+            source = next(cache.glob(f"*/{package['name']}-{package['version']}.crate"))
             source_dest = DEST / "mpl-sources"
             source_dest.mkdir(exist_ok=True)
             shutil.copy2(source, source_dest / source.name)

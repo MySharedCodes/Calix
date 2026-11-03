@@ -7,6 +7,7 @@ use std::process::{Child, Command, Stdio};
 use std::sync::{mpsc, Arc, Mutex};
 use std::time::Duration;
 use tauri::Manager;
+mod storage;
 #[cfg(windows)]
 use std::os::windows::process::CommandExt;
 #[cfg(windows)]
@@ -46,11 +47,37 @@ fn write_preferences(app: tauri::AppHandle, preferences: std::collections::BTree
     let directory = preference_directory(&app)?;
     std::fs::create_dir_all(&directory).map_err(|e|e.to_string())?;
     let path = directory.join("preferences.json");
-    let temporary = directory.join("preferences.json.tmp");
     let content = serde_json::to_vec(&preferences).map_err(|e|e.to_string())?;
-    std::fs::write(&temporary,content).map_err(|e|e.to_string())?;
-    std::fs::rename(temporary,path).map_err(|e|e.to_string())
+    storage::atomic_write(&path, &content)
 }
+
+#[tauri::command]
+fn write_recovery(app: tauri::AppHandle, content: String, checkpoint: bool) -> Result<(), String> {
+    let value: serde_json::Value = serde_json::from_str(&content).map_err(|e| e.to_string())?;
+    if value["version"] != 1 || !value["documents"].is_array() { return Err("Invalid recovery workspace".into()); }
+    storage::snapshot(&preference_directory(&app)?.join("recovery"), &content, checkpoint)
+}
+
+#[tauri::command]
+fn list_recovery(app: tauri::AppHandle) -> Result<Vec<storage::Revision>, String> {
+    storage::list(&preference_directory(&app)?.join("recovery"))
+}
+
+#[tauri::command]
+fn read_recovery(app: tauri::AppHandle, id: String) -> Result<String, String> {
+    storage::read(&preference_directory(&app)?.join("recovery"), &id)
+}
+
+fn file_history(path: &str) -> Result<PathBuf, String> {
+    let target = notebook_file(path)?;
+    Ok(target.parent().ok_or("Missing parent directory")?.join(".calix-history").join(target.file_name().ok_or("Missing file name")?))
+}
+
+#[tauri::command]
+fn list_file_versions(path: String) -> Result<Vec<storage::Revision>, String> { storage::list(&file_history(&path)?) }
+
+#[tauri::command]
+fn read_file_version(path: String, id: String) -> Result<String, String> { storage::read(&file_history(&path)?, &id) }
 
 #[cfg(windows)]
 fn own_backend(child: &Child) -> Result<OwnedHandle, String> {
@@ -133,10 +160,13 @@ fn write_notebook(path: String, content: String) -> Result<(), String> {
     let target = PathBuf::from(path);
     let extension = target.extension().and_then(|x| x.to_str()).unwrap_or("");
     if !extension.eq_ignore_ascii_case("cixnb") && !extension.eq_ignore_ascii_case("clxnb") && !extension.eq_ignore_ascii_case("calix") { return Err("Use the .cixnb file extension".into()); }
-    // Write to a sibling before replacing the user's file to avoid partial saves.
-    let temporary = target.with_extension(format!("{}.tmp", extension));
-    std::fs::write(&temporary, content).map_err(|e| e.to_string())?;
-    std::fs::rename(&temporary, &target).map_err(|e| e.to_string())
+    if target.exists() {
+        let previous = read_notebook(target.to_string_lossy().into())?;
+        let history = target.parent().ok_or("Missing parent directory")?.join(".calix-history")
+            .join(target.file_name().ok_or("Missing file name")?);
+        storage::snapshot(&history, &previous, true)?;
+    }
+    storage::atomic_write(&target, content.as_bytes())
 }
 
 fn notebook_file(path: &str) -> Result<PathBuf, String> {
@@ -227,7 +257,7 @@ fn main() {
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![connection_info, startup_notebook, read_preferences, write_preferences, read_notebook, write_notebook, delete_notebook, reveal_notebook])
+        .invoke_handler(tauri::generate_handler![connection_info, startup_notebook, read_preferences, write_preferences, write_recovery, list_recovery, read_recovery, list_file_versions, read_file_version, read_notebook, write_notebook, delete_notebook, reveal_notebook])
         .build(tauri::generate_context!())
         .expect("Calix desktop initialization failed");
     app.run(|handle, event| {
@@ -250,6 +280,25 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn saving_preserves_previous_versions_and_failed_save_keeps_source() {
+        let dir = std::env::temp_dir().join(format!("calix-save-test-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("笔记 with spaces.cixnb");
+        let name = path.to_string_lossy().to_string();
+        write_notebook(name.clone(), "first".into()).unwrap();
+        write_notebook(name.clone(), "second".into()).unwrap();
+        let versions = list_file_versions(name.clone()).unwrap();
+        assert_eq!(read_file_version(name.clone(), versions[0].id.clone()).unwrap(), "first");
+        assert!(write_notebook(name.clone(), "x".repeat(10_000_001)).is_err());
+        assert_eq!(read_notebook(name.clone()).unwrap(), "second");
+        write_notebook(name.clone(), "third".into()).unwrap();
+        let versions = list_file_versions(name.clone()).unwrap();
+        assert_eq!(read_file_version(name.clone(), versions[0].id.clone()).unwrap(), "second");
+        assert_eq!(read_file_version(name, versions[1].id.clone()).unwrap(), "first");
+        std::fs::remove_dir_all(dir).unwrap();
+    }
 
     #[test]
     fn notebook_deletion_only_removes_the_requested_regular_notebook() {

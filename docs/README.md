@@ -1,6 +1,6 @@
 # Calix 文档
 
-对应 0.1.27 工程预览版。源码许可仍以根目录 [LICENSE](../LICENSE) 为准；公开仓库和开源许可证待定。
+对应 0.1.28 工程预览版。源码许可仍以根目录 [LICENSE](../LICENSE) 为准；公开仓库和开源许可证待定。
 
 ## 第一次使用
 
@@ -29,10 +29,11 @@
 - [贡献指南](../CONTRIBUTING.md)
 - [安全问题处理](../SECURITY.md)
 - [开发路线](ROADMAP.md)
+- [稳定版验收与验证命令](ACCEPTANCE.md)
 - [公开发行准备](RELEASING.md)
 - [第三方许可证审查记录](LICENSE-REVIEW.md)
 - [Windows 打包补充记录](BUILD-NOTES.md)
-- [0.1.27 更新说明](CHANGES-0.1.27.md)
+- [0.1.28 更新说明](CHANGES-0.1.28.md)
 
 旧版 `CHANGES-*` 是历史记录，不是当前手册。遇到描述冲突，先核对软件版本、当前代码与本版帮助。
 

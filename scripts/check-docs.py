@@ -12,6 +12,7 @@ CURRENT = [
     'docs/INSTALLATION.md', 'docs/EXAMPLES.md', 'docs/TROUBLESHOOTING.md',
     'docs/DEVELOPMENT.md', 'docs/RELEASING.md', 'docs/ROADMAP.md',
     'docs/SUPPORTED-SYNTAX.md', 'docs/STATISTICS-AND-UNITS.md', 'docs/PDE.md',
+    'docs/ACCEPTANCE.md', 'docs/CHANGES-0.1.28.md',
 ]
 
 

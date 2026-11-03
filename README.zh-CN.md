@@ -40,7 +40,7 @@ Calix 使用 Wolfram 风格的**语法子集**，不等于 Mathematica v13 兼�
 
 当前已测试平台为 **Windows x64**，需要 Microsoft Edge WebView2。安装版自带计算服务与 Python，不需要另装 Python、Node.js 或 Mathematica。
 
-取得维护者提供的发行包后，运行 `Calix_0.1.27_x64-setup.exe`。安装时可选 PDE module、附加语言和皮肤。便携版应保留相邻运行目录，不能只复制一个 exe。见[安装与升级](docs/INSTALLATION.md)。
+取得维护者提供的发行包后，运行 `Calix_0.1.28_x64-setup.exe`。安装时可选 PDE module、附加语言和皮肤。便携版应保留相邻运行目录，不能只复制一个 exe。见[安装与升级](docs/INSTALLATION.md)。
 
 **发布状态：**公开 GitHub 地址与开源许可证尚未确定。当前源码仍适用 [LICENSE](LICENSE) 中的保留权利条款，尚未授予开放源码许可。文档暂不提供不存在的公开下载地址；后续公开发行以实际仓库和发布说明为准。
 
@@ -75,4 +75,4 @@ Calix 使用 Wolfram 风格的**语法子集**，不等于 Mathematica v13 兼�
 
 [文档首页](docs/README.md) · [故障排查](docs/TROUBLESHOOTING.md) · [开发路线](docs/ROADMAP.md) · [第三方许可](docs/LICENSE-REVIEW.md)
 
-当前版本：**0.1.27 工程预览版**。
+当前版本：**0.1.28 工程预览版**。

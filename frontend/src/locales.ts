@@ -1,6 +1,14 @@
 export type ExtraLanguage = 'ja' | 'fr' | 'ru' | 'de' | 'es';
 const order: ExtraLanguage[] = ['ja', 'fr', 'ru', 'de', 'es'];
 const rows: Record<string, [string, string, string, string, string]> = {
+  '恢复历史': ['復元履歴','Historique de récupération','История восстановления','Wiederherstellungsverlauf','Historial de recuperación'],
+  '恢复版本': ['復元バージョン','Versions de récupération','Версии восстановления','Wiederherstellungsversionen','Versiones de recuperación'],
+  '浏览器备份': ['ブラウザーのバックアップ','Sauvegarde du navigateur','Копия браузера','Browser-Sicherung','Copia del navegador'],
+  '最近副本': ['最新のコピー','Copie récente','Последняя копия','Letzte Kopie','Copia reciente'],
+  '选择恢复版本': ['復元するバージョンを選択','Sélectionner une version','Выберите версию','Version auswählen','Seleccionar una versión'],
+  '暂无恢复历史': ['復元履歴はありません','Aucun historique','История отсутствует','Kein Verlauf','Sin historial'],
+  '撤销单元操作': ['セル操作を元に戻す','Annuler une opération de cellule','Отменить действие с ячейкой','Zellaktion rückgängig machen','Deshacer operación de celda'],
+  '重做单元操作': ['セル操作をやり直す','Rétablir une opération de cellule','Повторить действие с ячейкой','Zellaktion wiederholen','Rehacer operación de celda'],
   '帮助': ['ヘルプ','Aide','Справка','Hilfe','Ayuda'],
   '关闭帮助': ['ヘルプを閉じる','Fermer l’aide','Закрыть справку','Hilfe schließen','Cerrar ayuda'],
   '帮助目录': ['ヘルプ項目','Rubriques d’aide','Темы справки','Hilfethemen','Temas de ayuda'],

@@ -9,7 +9,7 @@ fs.mkdirSync('docs/images', { recursive: true });
 
 (async () => {
   const desktop = !!process.env.CALIX_DESKTOP;
-  const browser = desktop ? await chromium.connectOverCDP('http://127.0.0.1:9227') : await chromium.launch({ headless: true, channel: 'msedge' });
+  const browser = desktop ? await chromium.connectOverCDP('http://127.0.0.1:9227') : await chromium.launch({ headless: true, ...(process.env.CALIX_BROWSER === 'chromium' ? {} : { channel: 'msedge' }) });
   try {
     const context = desktop ? browser.contexts()[0] : await browser.newContext({ viewport: { width: 1400, height: 1040 } });
     const page = desktop ? context.pages().find(item => /tauri\.localhost/.test(item.url())) : await context.newPage();
@@ -90,7 +90,7 @@ fs.mkdirSync('docs/images', { recursive: true });
     for (let index = 0; index < 6; index++) await page.locator('.notebook').dispatchEvent('wheel', { deltaY: 100, ctrlKey: true });
     await page.waitForFunction(() => document.querySelector('.zoom-reset')?.textContent === '70%');
     await page.setViewportSize({ width: 1400, height: 1280 });
-    await page.screenshot({ path: desktop ? path.join(output, 'notebook-desktop.png') : 'docs/images/notebook.png' });
+    await page.screenshot({ path: process.env.CALIX_CAPTURE_DOCS && !desktop ? 'docs/images/notebook.png' : path.join(output, 'notebook-preview.png') });
     await page.setViewportSize({ width: 1400, height: 1040 });
     await page.getByRole('button', { name: '传统计算器面板', exact: true }).click();
     const editor = page.locator('.calculator-cell .cm-content');
@@ -98,7 +98,7 @@ fs.mkdirSync('docs/images', { recursive: true });
     await page.keyboard.insertText('Integrate[Sin[x], {x,0,Pi}]');
     await page.keyboard.press('Control+Enter');
     await page.locator('.calculator-cell .formula').waitFor({ timeout: 15000 });
-    await page.screenshot({ path: desktop ? path.join(output, 'calculator-desktop.png') : 'docs/images/calculator.png' });
+    await page.screenshot({ path: process.env.CALIX_CAPTURE_DOCS && !desktop ? 'docs/images/calculator.png' : path.join(output, 'calculator-preview.png') });
     await page.keyboard.press('F1');
     await page.getByRole('dialog').getByRole('button', { name: '案例目录', exact: true }).click();
     await page.getByRole('link', { name: '弹性双摆', exact: true }).click();

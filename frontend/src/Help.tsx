@@ -27,7 +27,8 @@ import index from '../../docs/README.md?raw';
 const supplements = import.meta.glob([
   '../../README.zh-CN.md', '../../LICENSE', '../../docs/ROADMAP.md',
   '../../docs/RELEASING.md', '../../docs/BUILD-NOTES.md',
-  '../../docs/LICENSE-REVIEW.md', '../../docs/CHANGES-0.1.27.md',
+  '../../docs/LICENSE-REVIEW.md', '../../docs/CHANGES-0.1.28.md',
+  '../../docs/ACCEPTANCE.md',
 ], { query: '?raw', import: 'default' });
 const notebooks = import.meta.glob('../../examples/*.calix', { query: '?raw', import: 'default' });
 const pictures = import.meta.glob('../../docs/images/*.png', { eager: true, query: '?url', import: 'default' });
@@ -114,7 +115,7 @@ export default function Help({ onClose, onNotebook }: { onClose: () => void; onN
     if (event.key === 'F1') { event.preventDefault(); event.stopPropagation(); }
     if (event.ctrlKey && ['s','o'].includes(event.key.toLowerCase())) { event.preventDefault(); event.stopPropagation(); }
   }}>
-    <div className="help-header"><BookOpen size={19}/><strong id="help-title">{t('帮助')} · Calix</strong><span>0.1.27</span><button className="icon-button" aria-label={t('关闭帮助')} onClick={onClose}><X size={19}/></button></div>
+    <div className="help-header"><BookOpen size={19}/><strong id="help-title">{t('帮助')} · Calix</strong><span>0.1.28</span><button className="icon-button" aria-label={t('关闭帮助')} onClick={onClose}><X size={19}/></button></div>
     <div className="help-layout">
       <nav className="help-navigation" aria-label={t('帮助目录')}>
         <label className="help-search"><Search size={16}/><input ref={searchInput} value={query} onChange={event => setQuery(event.target.value)} placeholder={t('搜索帮助')} aria-label={t('搜索帮助')}/></label>

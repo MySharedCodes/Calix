@@ -5,7 +5,10 @@ $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Componen
 if (-not $vs) { throw 'Visual Studio C++ Build Tools are required' }
 $cmake = Join-Path $vs 'Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe'
 $boost = Join-Path $projectRoot 'tools\boost_1_86_0'
-& $cmake -S "$projectRoot\native" -B "$projectRoot\native\build" -G 'Visual Studio 17 2022' -A x64 "-DBOOST_ROOT=$boost"
+if ($env:CALIX_BOOST_ROOT) { $boost = $env:CALIX_BOOST_ROOT }
+$eigen = Join-Path $projectRoot 'tools\eigen-3.4.0'
+if ($env:CALIX_EIGEN_ROOT) { $eigen = $env:CALIX_EIGEN_ROOT }
+& $cmake -S "$projectRoot\native" -B "$projectRoot\native\build" -G 'Visual Studio 17 2022' -A x64 "-DBOOST_ROOT=$boost" "-DEIGEN_ROOT=$eigen"
 if ($LASTEXITCODE) { throw 'CMake configuration failed' }
 & $cmake --build "$projectRoot\native\build" --config Release --parallel
 if ($LASTEXITCODE) { throw 'Native build failed' }

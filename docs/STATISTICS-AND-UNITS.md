@@ -1,4 +1,4 @@
-# Statistics and Units (0.1.27)
+# Statistics and Units (0.1.28)
 
 Calix implements a documented Wolfram-style subset using SymPy, Pint, mpmath and the C++/Boost kernel. No Mathematica implementation or runtime is included.
 

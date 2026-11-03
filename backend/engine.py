@@ -7,6 +7,7 @@ import operator
 import builtins
 import pint
 import sympy as s
+from sympy.core.function import AppliedUndef
 from .presentation import expression_latex, expression_text
 from .syntax import InputError, Node, parse
 from .units import quantity, unit_text, dimensionless, format_quantity, simplify_quantity, unit_label
@@ -109,9 +110,18 @@ class Engine:
             except (TypeError, NotImplementedError, AttributeError):
                 text = str(result)
         unresolved = isinstance(result, s.Basic) and result.has(s.Integral, s.Sum, s.Product, s.Derivative)
+        if isinstance(result, list):
+            unresolved = any(part.get('unresolved', False) for part in parts)
+        expression = result.rhs if isinstance(result, s.Equality) else result
+        symbolic_functions = sorted({str(fn.func) for fn in expression.atoms(AppliedUndef)}) if isinstance(expression, s.Basic) else []
+        if isinstance(result, list):
+            symbolic_functions = sorted({name for part in parts for name in part.get('symbolic_functions', [])})
+        # A named symbolic function is legal input, but its display is not evidence of a solver result.
+        status = 'unevaluated' if unresolved else 'symbolic' if symbolic_functions else 'evaluated'
         return {"kind": "expression", "text": text, "latex": latex,
                 "elapsed_ms": round(elapsed, 2), "engine": self.route,
-                "unresolved": bool(unresolved), "variables": sorted(self.environment)}
+                "unresolved": bool(unresolved), "evaluation_status": status,
+                "symbolic_functions": symbolic_functions, "variables": sorted(self.environment)}
 
     def evaluate(self, node):
         kind, value, children = node.kind, node.value, node.args
@@ -216,6 +226,10 @@ class Engine:
                 result = quantity(candidate, unit_text(arguments[0]))
                 return simplify_quantity(result)
             name = target.value
+            if isinstance(self.environment.get(name), (SampledFunction, SampledDerivative)):
+                if len(arguments) != 1:
+                    raise InputError('An interpolating function takes one argument')
+                return self.environment[name]._at(self.evaluate(arguments[0]))
             if len(arguments) == 1 and ((name in self.environment and isinstance(self.environment[name], (s.Expr, pint.Quantity, list))) or (name[0].islower() and arguments[0].kind == 'string')):
                 unit = unit_text(arguments[0])
                 def attach(value):

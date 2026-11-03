@@ -1,0 +1,37 @@
+name: Build Windows preview artifact
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - run: python -m venv .venv
+      - run: ./.venv/Scripts/python.exe -m pip install -r requirements-dev.txt -r requirements-pde.txt -r requirements-sparse.txt
+      - run: npm ci
+      - run: ./scripts/bootstrap-native.ps1
+      - run: ./.venv/Scripts/python.exe scripts/verify.py --tier core
+      - run: ./scripts/build-desktop.ps1
+      - run: ./.venv/Scripts/python.exe scripts/stage-release.py
+      - run: ./.venv/Scripts/python.exe scripts/release-check.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-preview
+          path: |
+            release/*x64-setup.exe
+            release/SHA256.json
+            release/BUILD-INFO.json
+            release/RELEASE-CHECK.json

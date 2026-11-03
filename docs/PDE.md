@@ -1,4 +1,4 @@
-# PDE module, Version 0.1.27
+# PDE module, Version 0.1.28
 
 The component is optional. The ordinary calculator, units and ODE workflows
 remain available without it. Missing components produce an installation message.

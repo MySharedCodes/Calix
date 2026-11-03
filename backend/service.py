@@ -223,7 +223,7 @@ def create_app(token=None, frontend=None, role='desktop'):
     def health():
         from backend.native import kernel
         from backend.components import capabilities
-        return {"status": "ok", "version": "0.1.27", "native": kernel.available, "abi": 1, "api_version": 1,
+        return {"status": "ok", "version": "0.1.28", "native": kernel.available, "abi": 1, "api_version": 1,
                 "cpu_count": physical_cores(), "logical_cpu_count": os.cpu_count() or 1, "max_workers": app.state.pool.maximum, "components": capabilities(), "cpu_features":kernel.cpu_features()}
 
     @app.get('/api/capabilities')

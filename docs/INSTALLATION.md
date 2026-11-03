@@ -8,7 +8,7 @@
 
 ## 安装版
 
-1. 运行 `Calix_0.1.27_x64-setup.exe`。
+1. 运行 `Calix_0.1.28_x64-setup.exe`。
 2. 选择安装目录。安装包自带计算服务与 Python，不需要另装 Python、Node.js。
 3. 按需选择组件，安装完成后启动软件，等待计算引擎就绪。
 4. 运行[快速上手](GETTING-STARTED.md)中的示例。
@@ -33,7 +33,7 @@ WebView2 缺失时，安装器可能需要联网获取运行时。组织电脑�
 如发行包附有 SHA-256 清单，在 PowerShell 中执行：
 
 ```powershell
-Get-FileHash .\Calix_0.1.27_x64-setup.exe -Algorithm SHA256
+Get-FileHash .\Calix_0.1.28_x64-setup.exe -Algorithm SHA256
 ```
 
 与相同发行版公布的哈希比较。哈希不替代发布者身份或数字签名验证。未签名版本可能触发 SmartScreen；先核对来源、文件和维护者说明，不要直接关闭系统防护。

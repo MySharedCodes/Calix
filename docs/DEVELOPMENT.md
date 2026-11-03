@@ -89,10 +89,10 @@ npm.cmd run build
 
 ## 安装包
 
-现有打包脚本依赖维护者的 `tools/` 缓存布局，并非干净机器开箱即用的一条命令。准备以下内容后再运行：
+`scripts/bootstrap-native.ps1` 可下载指定版本的 Boost/Eigen 并验证归档，再构建 C++。也可用 `-BoostRoot`、`-EigenRoot` 指定已有头文件。桌面打包支持本地 `tools/cargo` 或标准 PATH 中的 Rust。完整发行仍需以下依赖与原始许可归档：
 
 - C++ 输出、锁定的 Python/npm 依赖，以及 PDE 和稀疏运行库；`package-service.py` 会扫描可选 Python 包所用标准库。
-- 本地 Rust：`tools/cargo/bin/cargo.exe`、`tools/rustup` 与 Cargo registry 缓存。可通过 rustup 的 `CARGO_HOME`/`RUSTUP_HOME` 配置安装；若使用全局 Rust，需要相应调整脚本。
+- Rust stable MSVC，可使用标准 rustup 安装；存在 `tools/cargo/bin/cargo.exe` 时脚本优先使用该本地工具链。
 - `work/eigen-3.4.0.zip`：上游原始源码归档，用于 `scripts/notices.py` 随包提供 MPL 对应源码。清理缓存后必须恢复该归档，不能静默略过。
 - 可用 NSIS，通常由 Tauri 安装至本机缓存，或使用 `tools/nsis-unpacked/nsis-3.08/Bin/makensis.exe`。
 
@@ -104,5 +104,7 @@ npm.cmd run build
 第一步生成 backend、可选组件、Tauri 程序及带选项的安装包；第二步组装 `release/Calix-portable` 并更新 `release/SHA256.json`。CLI 与 GUI 必须使用配套版本的 backend。仅修改 UI 和文档时，可以复用已验证的 backend，配置上述 Rust 环境后运行 `npm.cmd run tauri -- build`，再运行 `scripts/optional-installer.py` 与 `scripts/stage-release.py`。
 
 文档通过 `?raw` 导入编入帮助，同时作为 Markdown 随安装包分发。修改手册后应重新构建 UI；只复制 Markdown 不会更新 F1 中的内容。
+
+`scripts/verify.py` 提供核心、数值和完整案例三个有超时限制的验证层；`.github/workflows/verify.yml` 配置 Windows 自动验证。`scripts/verify-ui.py` 启动独立服务做浏览器测试。构建前运行 `scripts/build-info.py`，发行目录含源码提交与依赖摘要；发布前运行 `scripts/release-check.py`。详见 [稳定版验收](ACCEPTANCE.md)。
 
 构建中断时先看具体错误；[Windows 打包补充](BUILD-NOTES.md) 记录了本机曾遇到的 NSIS 缓存问题，不是普遍安装前提。公开发布另见 [发行准备](RELEASING.md)。

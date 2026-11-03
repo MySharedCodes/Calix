@@ -1,16 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Cell, NotebookFile } from './types';
 import { t } from './i18n';
-import { parseWorkspace, serializeWorkspace } from './workspace-codec';
+import { isRecoverableWorkspace, parseWorkspace, serializeWorkspace } from './workspace-codec';
+import { emptyHistory, recordStructure, travel, type CellHistory } from './workspace-history';
+import { persistLocal, persistDisk } from './recovery-store';
 
 export type Document = NotebookFile & { id: string; path: string | null; updated: number; example?: string };
-type Workspace = { version: 1; active: string; documents: Document[] };
+type Workspace = { version: 1; active: string; documents: Document[]; histories?: Record<string, CellHistory> };
 const key = 'calix-workspace-v1';
 
 export function useWorkspace(validate: (data: unknown) => NotebookFile, fallback: () => NotebookFile, onError: (error: string) => void) {
   const [workspace, setWorkspace] = useState<Workspace>(() => {
     try {
-      const saved = parseWorkspace(localStorage.getItem(key) || 'null') as Workspace | null;
+      let saved: Workspace | null = null;
+      for (const name of [key, 'calix-workspace-backup-v1']) {
+        try {
+          const candidate = parseWorkspace(localStorage.getItem(name) || 'null') as Workspace | null;
+          if (isRecoverableWorkspace(candidate)) { saved = candidate; break; }
+        } catch { /* Try the preceding local checkpoint. */ }
+      }
       if (saved?.version === 1 && Array.isArray(saved.documents) && saved.documents.length && saved.documents.length <= 100) {
         const ids = new Set<string>();
         const documents = saved.documents.map(doc => {
@@ -25,17 +33,17 @@ export function useWorkspace(validate: (data: unknown) => NotebookFile, fallback
     return { version: 1, active: id, documents: [{ ...fallback(), id, path: null, updated: Date.now() }] };
   });
   const latest = useRef(workspace); latest.current = workspace;
+  const checkpoint = useRef(false);
   const persist = useCallback(() => {
-    let legacy: string | null = null;
+    const value = { version: 1, active: latest.current.active, documents: latest.current.documents };
+    const force = checkpoint.current; checkpoint.current = false;
     try {
-      // Migrate the old single-notebook backup without storing large outputs twice.
-      legacy = localStorage.getItem('calix-notebook-v1');
+      persistLocal(serializeWorkspace(value), force);
       localStorage.removeItem('calix-notebook-v1');
-      localStorage.setItem(key, serializeWorkspace(latest.current));
     } catch {
-      if (legacy !== null) { try { localStorage.setItem('calix-notebook-v1', legacy); } catch { /* The prior workspace remains intact. */ } }
       onError('工作空间存储已满，请将笔记保存到文件');
     }
+    void persistDisk(value, force).catch(() => onError('磁盘恢复副本写入失败，请将笔记保存到文件'));
   }, [onError]);
   useEffect(() => { const timer = setTimeout(persist, 400); return () => clearTimeout(timer); }, [workspace, persist]);
   useEffect(() => {
@@ -55,14 +63,35 @@ export function useWorkspace(validate: (data: unknown) => NotebookFile, fallback
   }, [onError]);
   const activate = useCallback((id: string) => setWorkspace(previous => previous.documents.some(doc => doc.id === id) ? { ...previous, active: id } : previous), []);
   const remove = useCallback((id: string) => setWorkspace(previous => {
+    checkpoint.current = true;
+    const histories = { ...previous.histories }; delete histories[id];
     const documents = previous.documents.filter(doc => doc.id !== id);
     if (!documents.length) {
       const fresh = crypto.randomUUID();
       documents.push({ format: 'calix-notebook', version: 1, id: fresh, path: null, updated: Date.now(), title: t('未命名笔记'), cells: [{ id: crypto.randomUUID(), mode: 'source', code: '' }] });
     }
-    return { ...previous, documents, active: previous.active === id ? documents[0].id : previous.active };
+    return { ...previous, documents, histories, active: previous.active === id ? documents[0].id : previous.active };
   }), []);
   const current = workspace.documents.find(doc => doc.id === workspace.active)!;
-  const setCells = useCallback((value: Cell[] | ((cells: Cell[]) => Cell[])) => update(doc => ({ cells: typeof value === 'function' ? value(doc.cells) : value })), [update]);
-  return { ...workspace, current, setCells, update, create, activate, remove };
+  const setCells = useCallback((value: Cell[] | ((cells: Cell[]) => Cell[])) => {
+    setWorkspace(previous => {
+      const doc = previous.documents.find(item => item.id === previous.active)!;
+      const cells = typeof value === 'function' ? value(doc.cells) : value;
+      if (!cells.length || cells.length > 200) { onError('笔记最多包含 200 个单元'); return previous; }
+      const before = previous.histories?.[doc.id] || emptyHistory();
+      const history = recordStructure(doc.cells, cells, before);
+      if (history.past !== before.past) checkpoint.current = true;
+      return { ...previous, documents: previous.documents.map(item => item.id === doc.id ? { ...doc, cells, updated: Date.now() } : item), histories: { ...previous.histories, [doc.id]: history } };
+    });
+  }, [onError]);
+  const navigateHistory = useCallback((direction: 'undo' | 'redo') => {
+    checkpoint.current = true;
+    setWorkspace(previous => {
+      const doc = previous.documents.find(item => item.id === previous.active)!;
+      const result = travel(doc.cells, previous.histories?.[doc.id] || emptyHistory(), direction);
+      return { ...previous, documents: previous.documents.map(item => item.id === doc.id ? { ...doc, cells: result.cells, updated: Date.now() } : item), histories: { ...previous.histories, [doc.id]: result.history } };
+    });
+  }, []);
+  return { ...workspace, current, setCells, update, create, activate, remove, navigateHistory,
+    canUndo: !!workspace.histories?.[workspace.active]?.past.length, canRedo: !!workspace.histories?.[workspace.active]?.future.length };
 }

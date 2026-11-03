@@ -116,13 +116,20 @@ def test_second_order_initial_derivative():
 
 def test_shipped_examples():
     import json
+    import os
+    import time
     from pathlib import Path
+    kernel.configure_threads(int(os.environ.get('CALIX_MAX_WORKERS', '8')))
     for path in (Path(__file__).resolve().parents[1] / "examples").glob("*.calix"):
+        print(f'Example: {path.name}', flush=True)
         engine = Engine()
-        for cell in json.loads(path.read_text(encoding="utf-8"))["cells"]:
+        for index, cell in enumerate(json.loads(path.read_text(encoding="utf-8"))["cells"], 1):
             if cell["mode"] == "markdown":
                 continue
+            print(f'  cell {index}', flush=True)
+            started = time.perf_counter()
             result = engine.execute(cell["code"])
+            print(f'  completed in {time.perf_counter()-started:.3f}s', flush=True)
             assert result["kind"] in ("expression", "plot", "group", "animation"), (path, cell["code"])
 
 

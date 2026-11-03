@@ -14,6 +14,7 @@ export type PlotResult = {
 export type ExpressionResult = {
   kind: 'expression'; text: string; latex: string; elapsed_ms: number; engine: string;
   unresolved?: boolean; variables?: string[];
+  evaluation_status?: 'evaluated' | 'symbolic' | 'unevaluated'; symbolic_functions?: string[];
 };
 export type AnimationResult = {
   kind: 'animation'; animation_type: 'trajectory' | 'frames'; plot: PlotResult;

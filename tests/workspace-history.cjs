@@ -1,0 +1,17 @@
+const fs = require('node:fs'), vm = require('node:vm'), assert = require('node:assert/strict'), ts = require('typescript');
+const moduleObject = { exports: {} };
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('frontend/src/workspace-history.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText, { exports: moduleObject.exports });
+const { emptyHistory, recordStructure, travel } = moduleObject.exports;
+const a = { id: 'a', code: '1+1', mode: 'source' }, b = { id: 'b', code: '2+2', mode: 'source' };
+let history = recordStructure([a], [a,b], emptyHistory());
+let undo = travel([a,b], history, 'undo');
+assert.equal(undo.cells.length, 1);
+assert.equal(undo.history.future.length, 1);
+let redo = travel(undo.cells, undo.history, 'redo');
+assert.equal(redo.cells.length, 2);
+assert.equal(recordStructure([a], [{...a, code:'3'}], undo.history).future.length, 0);
+const resultOnly = recordStructure([a], [{...a, result:{text:'2'}}], history);
+assert.equal(resultOnly, history);
+for (let i=0;i<40;i++) history = recordStructure([a], [b,a], history);
+assert.equal(history.past.length, 20);
+console.log('Cell history: structural undo/redo, edits, result preservation and bounded retention passed');

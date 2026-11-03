@@ -1,6 +1,6 @@
 # Get Started
 
-This walkthrough uses Calix 0.1.27 on Windows x64. For installation and optional
+This walkthrough uses Calix 0.1.28 on Windows x64. For installation and optional
 components, see [installation (中文)](INSTALLATION.md). The packaged application
 contains its calculation service; you do not need Mathematica, Python or Node.js
 to use the installer. The public repository and license are still undecided;
