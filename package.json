@@ -3,7 +3,15 @@
   "version": "0.1.28",
   "private": true,
   "description": "CALculation and Interactive eXpressions",
-  "license": "UNLICENSED",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MySharedCodes/Calix.git"
+  },
+  "homepage": "https://github.com/MySharedCodes/Calix#readme",
+  "bugs": {
+    "url": "https://github.com/MySharedCodes/Calix/issues"
+  },
   "type": "module",
   "overrides": {
     "katex": "$katex"

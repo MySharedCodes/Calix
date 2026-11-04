@@ -28,7 +28,7 @@ const supplements = import.meta.glob([
   '../../README.zh-CN.md', '../../LICENSE', '../../docs/ROADMAP.md',
   '../../docs/RELEASING.md', '../../docs/BUILD-NOTES.md',
   '../../docs/LICENSE-REVIEW.md', '../../docs/CHANGES-0.1.28.md',
-  '../../docs/ACCEPTANCE.md',
+  '../../docs/ACCEPTANCE.md', '../../docs/LICENSING.md',
 ], { query: '?raw', import: 'default' });
 const notebooks = import.meta.glob('../../examples/*.calix', { query: '?raw', import: 'default' });
 const pictures = import.meta.glob('../../docs/images/*.png', { eager: true, query: '?url', import: 'default' });

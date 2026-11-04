@@ -78,3 +78,5 @@
 ## 发布判定
 
 源码提交、锁文件哈希、源文件摘要和工具版本写入 `BUILD-INFO.json`。`scripts/release-check.py` 检查发行文件与哈希；`--public` 还会在许可证、仓库、签名和外部验收仍待定时拒绝标记公开发行就绪。详见 [发行准备](RELEASING.md)。
+
+2026-11-04 已确定应用许可证为 `GPL-3.0-only`，并公开源码仓库 [MySharedCodes/Calix](https://github.com/MySharedCodes/Calix)。Windows 签名尚未配置；现有安装包早于此次许可证变更。发行检查会拒绝沿用与当前 LICENSE 不一致的便携版许可文件，并将捆绑 Intel PDE 运行库的 GPLv3 兼容性列为待解决项。源码公开不代表已完成重新打包或二进制发行，见[许可与签名状态](LICENSING.md)。

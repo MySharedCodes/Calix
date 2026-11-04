@@ -56,11 +56,19 @@ A source checkout can generate it under `release/`. Choose **PDE module**,
 additional languages and themes as needed. A portable distribution must retain
 its adjacent runtime directories. See [installation](docs/INSTALLATION.md).
 
-**Publication status:** the public repository address and application license
-have not yet been selected. This checkout remains under its current
-[LICENSE](LICENSE), which reserves application-source rights. Readable source
-is not automatically open source. No public download URL is advertised until
-a release actually exists.
+**License:** Calix-owned source, documentation and examples are licensed under
+[GNU GPLv3 only](LICENSE) (`GPL-3.0-only`). Third-party components retain their
+own licenses. See [licensing, repository and signing](docs/LICENSING.md) for scope
+and binary-distribution requirements.
+
+**Source repository:** [MySharedCodes/Calix](https://github.com/MySharedCodes/Calix).
+Use [Issues](https://github.com/MySharedCodes/Calix/issues) for reproducible bugs
+and [private security reports](https://github.com/MySharedCodes/Calix/security/advisories/new)
+for vulnerabilities. This is an engineering preview published as source.
+Existing Windows binaries and installers are unsigned
+and predate this license change. The bundled Intel PDE runtime's compatibility
+with GPLv3 distribution remains unresolved. No public download URL is advertised
+until a release actually exists.
 
 ## Start with an Example
 
@@ -99,7 +107,7 @@ including proprietary Intel runtime binaries in the PDE distribution.
 
 [Development setup](docs/DEVELOPMENT.md) covers Windows prerequisites, tests and
 packaging. [Contributing](CONTRIBUTING.md) covers reproducible calculation bugs,
-documentation and future code contributions, subject to the current license.
+documentation and code contributions under GPL-3.0-only.
 Useful contributions include reduced failing expressions, independently checked
 examples, translations and reports from other Windows machines.
 

@@ -42,7 +42,9 @@ Calix 使用 Wolfram 风格的**语法子集**，不等于 Mathematica v13 兼�
 
 取得维护者提供的发行包后，运行 `Calix_0.1.28_x64-setup.exe`。安装时可选 PDE module、附加语言和皮肤。便携版应保留相邻运行目录，不能只复制一个 exe。见[安装与升级](docs/INSTALLATION.md)。
 
-**发布状态：**公开 GitHub 地址与开源许可证尚未确定。当前源码仍适用 [LICENSE](LICENSE) 中的保留权利条款，尚未授予开放源码许可。文档暂不提供不存在的公开下载地址；后续公开发行以实际仓库和发布说明为准。
+**许可证：**Calix 自有源码、文档和示例采用 [GNU GPLv3，仅第 3 版](LICENSE)（`GPL-3.0-only`）。第三方组件保留各自许可证。许可范围、源码提供义务及发布要求见[许可证、仓库与代码签名](docs/LICENSING.md)。
+
+**源码仓库：**[MySharedCodes/Calix](https://github.com/MySharedCodes/Calix)。计算错误和功能反馈可提交到 [Issues](https://github.com/MySharedCodes/Calix/issues)，安全漏洞请使用[私密报告入口](https://github.com/MySharedCodes/Calix/security/advisories/new)。当前公开工程预览版源码。现有 Windows 程序和安装包未签名，且构建于本次许可变更之前；捆绑 Intel PDE 运行库的 GPLv3 分发兼容性尚待解决。下载地址待二进制正式发行后公布。
 
 ## 从案例开始
 
@@ -69,7 +71,7 @@ Calix 使用 Wolfram 风格的**语法子集**，不等于 Mathematica v13 兼�
 
 ## 开发与反馈
 
-[开发指南](docs/DEVELOPMENT.md)提供 Windows 环境、构建和测试步骤；[贡献说明](CONTRIBUTING.md)说明如何提交可复现的错误、案例和文档反馈。公开仓库与贡献授权确定后，再按仓库公布的规则参与代码开发。
+[开发指南](docs/DEVELOPMENT.md)提供 Windows 环境、构建和测试步骤；[贡献说明](CONTRIBUTING.md)说明如何提交可复现的错误、案例和文档反馈，以及按 GPL-3.0-only 参与代码开发。
 
 项目尤其需要：其他 Windows 机器上的安装反馈、可复现的计算错误、独立核对的案例、术语与翻译修正。性能反馈请区分冷启动、CLI 往返、实际求解和绘图时间。
 

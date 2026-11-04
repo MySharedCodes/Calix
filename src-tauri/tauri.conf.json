@@ -26,6 +26,8 @@
   },
   "bundle": {
     "active": true,
+    "license": "GPL-3.0-only",
+    "licenseFile": "../LICENSE",
     "targets": [
       "nsis"
     ],

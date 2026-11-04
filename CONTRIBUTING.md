@@ -1,11 +1,16 @@
 # Contributing to Calix / 参与 Calix
 
 Calix welcomes reproducible bug reports, verified examples, documentation corrections
-and translation feedback. The public repository URL and open-source license are
-still undecided. The current [LICENSE](LICENSE) reserves application-source rights;
-this document does not grant permission to redistribute or relicense the code.
-Before submitting code, confirm the contribution terms with the maintainer.
-No contributor agreement or copyright transfer is implied here.
+and translation feedback. Calix-owned code, documentation and examples use
+[GPL-3.0-only](LICENSE). Contributions to those files are submitted under the same
+license; contributors retain copyright. Submit only work you can license on those
+terms and identify any third-party material and its license. No separate CLA or
+copyright transfer is required by this document.
+
+The source repository is [MySharedCodes/Calix](https://github.com/MySharedCodes/Calix).
+Use [Issues](https://github.com/MySharedCodes/Calix/issues) for reports and proposals,
+and pull requests for code or documentation changes. See
+[licensing and publication status](docs/LICENSING.md).
 
 ## Report a Calculation Error
 
@@ -25,8 +30,7 @@ Actual result:
 Expected result and independent check:
 ```
 
-Use the issue templates when a public repository is available. Until then, give
-this report to the maintainer through the channel where you received the software.
+Use the issue templates in the [public repository](https://github.com/MySharedCodes/Calix/issues/new/choose).
 Remove API tokens, private notebooks, local account names and personal data.
 Security issues follow [SECURITY.md](SECURITY.md).
 

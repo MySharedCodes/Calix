@@ -1,6 +1,6 @@
 # Calix 文档
 
-对应 0.1.28 工程预览版。源码许可仍以根目录 [LICENSE](../LICENSE) 为准；公开仓库和开源许可证待定。
+对应 0.1.28 工程预览版。Calix 自有源码采用 [GPL-3.0-only](../LICENSE)，公开仓库为 [MySharedCodes/Calix](https://github.com/MySharedCodes/Calix)。当前仅公开源码，现有本地 Windows 发行文件未签名。
 
 ## 第一次使用
 
@@ -31,6 +31,7 @@
 - [开发路线](ROADMAP.md)
 - [稳定版验收与验证命令](ACCEPTANCE.md)
 - [公开发行准备](RELEASING.md)
+- [许可证、仓库与代码签名](LICENSING.md)
 - [第三方许可证审查记录](LICENSE-REVIEW.md)
 - [Windows 打包补充记录](BUILD-NOTES.md)
 - [0.1.28 更新说明](CHANGES-0.1.28.md)

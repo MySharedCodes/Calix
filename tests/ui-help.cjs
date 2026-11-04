@@ -113,8 +113,11 @@ fs.mkdirSync('docs/images', { recursive: true });
     await page.locator('.engine-status.ready').waitFor();
     await page.keyboard.press('F1');
     await page.getByRole('heading', { name: 'Get Started', exact: true }).waitFor();
+    await page.getByRole('dialog').getByRole('link', { name: 'licensing and release status', exact: true }).click();
+    await page.getByRole('heading', { name: '许可证、仓库与代码签名', exact: true }).waitFor();
     await page.getByRole('dialog').getByRole('link', { name: 'LICENSE', exact: true }).click();
-    await page.getByRole('article').getByText('All rights reserved.', { exact: false }).first().waitFor();
+    await page.getByRole('article').getByText('Version 3, 29 June 2007', { exact: false }).first().waitFor();
+    assert.match(await page.getByRole('article').innerText(), /Version 3, 29 June 2007/);
     assert.deepEqual(errors, []);
     console.log('Help: F1, navigation, search, focus, mobile layout, notebook preservation, example opening and screenshots passed');
   } finally { await browser.close(); }

@@ -1,4 +1,4 @@
-const{chromium}=require('C:/Users/Numerical_Magic_Box/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const{chromium}=require(process.env.CALIX_PLAYWRIGHT || 'playwright');
 const{spawn,execFile,execFileSync}=require('node:child_process');
 const fs=require('node:fs');
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));

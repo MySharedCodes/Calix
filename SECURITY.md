@@ -1,14 +1,18 @@
 # Security Policy
 
 Calix is an engineering preview. There is no published support window or security
-response SLA. The application license and public repository are not yet selected.
+response SLA. Calix-owned source uses [GPL-3.0-only](LICENSE). The source repository
+is [MySharedCodes/Calix](https://github.com/MySharedCodes/Calix).
+
+Existing Windows binaries and installers are unsigned. See
+[licensing and signing status](docs/LICENSING.md) for the release procedure.
 
 ## Reporting
 
-Report a suspected vulnerability privately to the maintainer through the channel
-where you obtained Calix. No public security email or private reporting URL has
-been configured in this checkout. Once a public repository exists, its maintainer
-should enable a private reporting channel before inviting vulnerability reports.
+Report a suspected vulnerability through GitHub's
+[private vulnerability reporting](https://github.com/MySharedCodes/Calix/security/advisories/new).
+If that channel is unavailable, contact the maintainer privately through the
+channel where you obtained Calix. No dedicated security email is published.
 
 Include the affected version, operating system, minimal reproduction, impact and
 any workaround. Do not include live credentials, private notebooks or an exploit

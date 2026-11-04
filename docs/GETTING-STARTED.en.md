@@ -3,8 +3,10 @@
 This walkthrough uses Calix 0.1.28 on Windows x64. For installation and optional
 components, see [installation (中文)](INSTALLATION.md). The packaged application
 contains its calculation service; you do not need Mathematica, Python or Node.js
-to use the installer. The public repository and license are still undecided;
-the current [LICENSE](../LICENSE) applies.
+to use the installer. Calix-owned source uses [GPL-3.0-only](../LICENSE).
+The source repository is [MySharedCodes/Calix](https://github.com/MySharedCodes/Calix).
+No public binary release is available yet. Existing Windows builds are
+unsigned; see [licensing and release status](LICENSING.md).
 
 ## Create a Notebook
 

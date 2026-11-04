@@ -4,7 +4,7 @@
 
 已测试目标为 Windows x64，桌面依赖 Microsoft Edge WebView2。Linux、macOS、ARM64 的桌面发行与完整构建尚未验证，不能从 Tauri 的跨平台能力推断 Calix 已支持这些平台。
 
-公开仓库和开源许可证尚未确定。当前根目录 LICENSE 仍保留应用源码权利。取得维护者提供的发行包后可按本页使用；后续以实际发行页公布的文件和授权为准。
+Calix 自有源码采用 [GPL-3.0-only](../LICENSE)，公开源码仓库为 [MySharedCodes/Calix](https://github.com/MySharedCodes/Calix)。当前没有公开二进制下载。现有本地程序和安装包未签名，且构建于本次许可变更之前；含 Intel PDE 运行库的组合分发兼容性尚待解决。详见[许可证、仓库与代码签名](LICENSING.md)。
 
 ## 安装版
 

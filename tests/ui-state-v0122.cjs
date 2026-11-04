@@ -1,4 +1,4 @@
-const{chromium}=require('C:/Users/Numerical_Magic_Box/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const{chromium}=require(process.env.CALIX_PLAYWRIGHT || 'playwright');
 const fs=require('node:fs'),zlib=require('node:zlib'),assert=require('node:assert/strict');
 (async()=>{const b=await chromium.launch({channel:'msedge',headless:true});try{
  const p=await b.newPage({viewport:{width:1440,height:1000}}),errors=[];p.on('pageerror',e=>errors.push(e.message));

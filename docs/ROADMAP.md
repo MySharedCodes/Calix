@@ -44,10 +44,11 @@ a solver. Shipped features still need broader numerical and platform validation.
 
 ## Public Distribution
 
-- Decide application license and repository address after rights review.
+- Calix-owned source is published under GPL-3.0-only at
+  [MySharedCodes/Calix](https://github.com/MySharedCodes/Calix).
 - Audit source, assets, exact binary dependencies and third-party notices.
 - Provide verified releases, hashes, private security reporting and contribution terms.
 - Evaluate Windows signing and maintain current onboarding material.
 
 [Release preparation](RELEASING.md) records the work required before publication.
-No public release date has been selected.
+No public binary release date has been selected.

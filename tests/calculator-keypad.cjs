@@ -1,4 +1,4 @@
-const {chromium}=require('C:/Users/Numerical_Magic_Box/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const {chromium}=require(process.env.CALIX_PLAYWRIGHT || 'playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs');
 
 (async()=>{

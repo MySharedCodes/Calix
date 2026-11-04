@@ -4,7 +4,8 @@ version = "0.1.28"
 description = "CALculation and Interactive eXpressions"
 authors = ["Calix"]
 edition = "2021"
-license = "LicenseRef-Proprietary"
+license = "GPL-3.0-only"
+repository = "https://github.com/MySharedCodes/Calix"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

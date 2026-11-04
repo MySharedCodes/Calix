@@ -1,9 +1,16 @@
 # 开发环境与构建
 
 当前验证目标是 Windows x64；Linux/macOS 没有经过完整桌面发行验证。
-应用许可证见 [LICENSE](../LICENSE)，公开仓库与开源许可待定。
+Calix 自有源码采用 [GPL-3.0-only](../LICENSE)，公开仓库为 [MySharedCodes/Calix](https://github.com/MySharedCodes/Calix)。代码签名尚未配置。见[许可证与发布状态](LICENSING.md)。
 
 ## 环境
+
+先克隆源码并进入项目目录：
+
+```powershell
+git clone https://github.com/MySharedCodes/Calix.git
+cd Calix
+```
 
 | 依赖 | 当前使用方式 |
 |---|---|
@@ -29,7 +36,7 @@ npm.cmd ci
 .\.venv\Scripts\python.exe -m pip install -r requirements-sparse.txt
 ```
 
-Intel 运行库有独立分发条款，不能视为应用许可证的一部分。见 [许可审查](LICENSE-REVIEW.md)。
+Intel 运行库有独立限制，其与 GPLv3 组合分发的兼容性尚未解决；上述安装步骤用于本地开发，不能作为已获组合分发授权的证明。公开二进制发行前需解决求解器与运行库的许可问题。见[许可审查](LICENSE-REVIEW.md)。
 
 ## 项目结构
 

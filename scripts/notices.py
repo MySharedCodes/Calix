@@ -1,4 +1,4 @@
-"""Collect installed component licenses without granting rights to Calix source."""
+"""Collect component licenses independently of the Calix application license."""
 from pathlib import Path
 import importlib.metadata as metadata
 import json
@@ -111,7 +111,7 @@ for file in (ROOT / "docs/licenses").glob("*"):
 
 (DEST / "components.json").write_text(json.dumps(records, indent=2, ensure_ascii=False), encoding="utf-8")
 version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
-sections = [f"Calix {version} - Third-party notices", "Calix application code is proprietary. Third-party components retain their own licenses.", ""]
+sections = [f"Calix {version} - Third-party notices", "Calix application code is licensed under GPL-3.0-only. Third-party components retain their own licenses; see docs/LICENSE-REVIEW.md for distribution constraints.", ""]
 for record in records:
     sections.append(f"{record['ecosystem']}: {record['name']} {record['version']} | {record['license']}")
     sections.extend("  " + file for file in record["license_files"])

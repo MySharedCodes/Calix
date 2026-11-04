@@ -1,4 +1,4 @@
-const {chromium}=require('C:/Users/Numerical_Magic_Box/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const {chromium}=require(process.env.CALIX_PLAYWRIGHT || 'playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),{spawn,execFileSync}=require('node:child_process');
 const directory=process.env.CALIX_PREFS_PROFILE||'D:/Calix/work/webview-v0121-test';
 const expected={'calix-digits':'32','calix-workers':'8','calix-language':'ja','calix-theme':'ocean','calix-notebook-zoom':'115'};
