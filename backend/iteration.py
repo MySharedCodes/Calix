@@ -7,6 +7,19 @@ from .syntax import InputError
 NOTHING = s.Symbol('Nothing')
 
 
+def finite_aggregate(engine, name, nodes):
+    """Evaluate bounded indexed expressions before combining scalar terms."""
+    values = table(engine, nodes)
+    def terms(value, depth):
+        if depth:
+            return [term for item in value for term in terms(item, depth - 1)]
+        if isinstance(value, (list, dict)):
+            raise InputError(f'{name} with indexed data currently requires scalar terms')
+        return [value]
+    values = terms(values, len(nodes) - 1)
+    return (s.Add if name == 'Sum' else s.Mul)(*values)
+
+
 def table(engine, nodes):
     if len(nodes) < 2:
         raise InputError('Table expects an expression and one or more iterators')

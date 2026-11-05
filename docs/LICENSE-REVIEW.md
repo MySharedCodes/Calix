@@ -12,7 +12,7 @@ GPL binary releases must provide the corresponding source required by GPLv3 sect
 
 ## Selected Components
 
-- MIT/ISC: React, MathLive, CodeMirror, Cortex Compute Engine (math-input parsing only), KaTeX, Three.js, Plotly.js, Lucide, fflate (lossless workspace compression) and their relevant dependencies.
+- MIT/ISC: React, MathLive, CodeMirror, Cortex Compute Engine (math-input parsing only), KaTeX, Three.js, Plotly.js, Lucide, fflate (lossless workspace compression), Tiptap / ProseMirror (text editing), unified / remark / rehype (Markdown parsing and sanitizing) and their relevant dependencies. Only the MIT-licensed Tiptap packages are selected; no paid Tiptap service or proprietary extension is used.
 - MIT/Apache dual-licensed: Tauri and supported Rust dependency paths.
 - BSD: SymPy, mpmath, Pint, Boost-adjacent Python service dependencies where applicable.
 - Boost Software License 1.0: native Boost.Math and Boost.Odeint.

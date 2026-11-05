@@ -39,7 +39,7 @@ with (ROOT/'work/ui-runner.log').open('w', encoding='utf-8') as log:
         processes.append(subprocess.Popen([sys.executable, '-m', 'backend.service', '--port', str(service_port), '--token', 'calix-local-development'], cwd=ROOT, env=env, stdout=log, stderr=log))
         processes.append(subprocess.Popen(['node', 'node_modules/vite/bin/vite.js', '--config', 'frontend/vite.config.ts', '--host', '127.0.0.1', '--port', str(ui_port), '--strictPort'], cwd=ROOT, env=env, stdout=log, stderr=log))
         wait_url(f'http://127.0.0.1:{ui_port}')
-        for test in ('tests/ui-stability.cjs', 'tests/ui-help.cjs'):
+        for test in ('tests/ui-stability.cjs', 'tests/ui-help.cjs', 'tests/ui-text-contents.cjs', 'tests/ui-output-clear.cjs'):
             subprocess.run(['node', test], cwd=ROOT, env=env, check=True, timeout=180)
         passed = True
     finally:
@@ -56,4 +56,4 @@ with (ROOT/'work/ui-runner.log').open('w', encoding='utf-8') as log:
                 process.wait()
         evidence = ROOT/'work/verification'
         evidence.mkdir(exist_ok=True)
-        (evidence/'browser-ui.json').write_text(json.dumps({'passed': passed, 'seconds': round(time.perf_counter()-started,3), 'checks': ['workspace recovery and undo', 'offline help and calculator']}, indent=2)+'\n', encoding='utf-8')
+        (evidence/'browser-ui.json').write_text(json.dumps({'passed': passed, 'seconds': round(time.perf_counter()-started,3), 'checks': ['workspace recovery and undo', 'offline help and calculator', 'text formatting, animated contents and notebook roundtrip', 'clear outputs and retained variables']}, indent=2)+'\n', encoding='utf-8')

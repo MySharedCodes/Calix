@@ -36,7 +36,7 @@ a trailing `;` hides an intermediate definition.
 | Algebra and calculus | Factor/expand/simplify, series, derivatives, integrals, equations, ODEs and recurrences |
 | Numerical work | Bracketed roots, quadrature, ODE initial-value problems, bounded extrema and fitting |
 | Visual exploration | Curves, contours, surfaces, parametric plots, animation and PNG export |
-| Working documents | Multiple notebooks, formula input, Markdown with mathematics, saved inputs and outputs |
+| Working documents | Multiple notebooks, formula input, rich text with mathematics, heading styles, searchable contents and saved inputs and outputs |
 | Automation | CLI, authenticated loopback API, persistent JSONL, notebook export and desktop handoff |
 | Optional PDE module | Documented analytical PDE and numerical FEM/flow cases with explicit model limits |
 
@@ -44,6 +44,11 @@ Calix accepts a **Wolfram-style language subset**, not arbitrary Mathematica
 programs. It does not include or require a Wolfram runtime. See
 [supported syntax](docs/SUPPORTED-SYNTAX.md) and [PDE scope](docs/PDE.md).
 Engineering examples are learning and verification material, not certified design tools.
+
+Text cells support font sizes, emphasis, headings 1–6 and Markdown source editing.
+Headings automatically enable a searchable contents panel with direct navigation.
+The notebook toolbar can clear all outputs while retaining inputs and session variables.
+See the [text editing and contents guide](docs/USER-GUIDE.md).
 
 ## Install and Run
 

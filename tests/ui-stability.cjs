@@ -18,6 +18,7 @@ fs.mkdirSync(output, {recursive:true});
       sessionStorage.setItem('stability-seeded','1');
     });
     await page.goto(process.env.CALIX_URL || 'http://127.0.0.1:5173');
+    await page.waitForFunction(()=>localStorage.getItem('calix-workspace-v1'));
     await page.locator('.engine-status.ready').waitFor({timeout:30000});
     assert.equal(await page.locator('.cell').count(),2);
     await page.locator('.cell').last().getByRole('button',{name:'删除单元',exact:true}).click();

@@ -9,6 +9,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 CORE = ['tests/test_engine.py', 'tests/test_independent_validation.py', 'tests/test_presentation.py',
+        'tests/test_indexed_aggregates.py',
         'tests/test_multiline_units.py', 'tests/test_service.py', 'tests/test_cli_api.py',
         'tests/test_release_licensing.py']
 NUMERICAL = ['tests/test_cpu_dispatch.py', 'tests/test_execution_runtime.py',

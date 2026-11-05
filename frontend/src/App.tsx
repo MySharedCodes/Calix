@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BookOpen, Calculator, Plus, Play, Square, RotateCcw, FolderOpen, Save, SaveAll, ChevronDown, Trash2, Copy, ArrowDownToLine, ArrowUp, ArrowDown, Check, X, PanelLeftClose, PanelLeftOpen, Sigma, FunctionSquare, Settings2, FilePlus2, LoaderCircle, Undo2, Redo2, History } from 'lucide-react';
+import { BookOpen, Calculator, Plus, Play, Square, RotateCcw, Eraser, FolderOpen, Save, SaveAll, ChevronDown, Trash2, Copy, ArrowDownToLine, ArrowUp, ArrowDown, Check, X, PanelLeftClose, PanelLeftOpen, Sigma, FunctionSquare, Settings2, FilePlus2, LoaderCircle, Undo2, Redo2, History } from 'lucide-react';
 import katex from 'katex';
 import { Editor, assertCompleteInput } from './Editor';
 import { Plot } from './Plot';
@@ -10,6 +10,7 @@ import * as api from './api';
 import type { Cell, Result, NotebookFile } from './types';
 import { CalculatorView } from './CalculatorView';
 import { MarkdownCell } from './MarkdownCell';
+import { NotebookContents } from './NotebookContents';
 import starter from './starter.json';
 import exampleNotebooks from './example-notebooks.json';
 import legacyGear from './legacy-gear-v0121.json';
@@ -272,6 +273,11 @@ export default function App() {
     finally { busyRef.current = false; setBusy(null); }
   }, [runOne, status, toast]);
 
+  const clearOutputs = useCallback(() => {
+    if (busyRef.current) return;
+    setCells(previous => previous.map(cell => ({ ...cell, result: undefined, error: undefined, stale: undefined, executed: undefined })));
+  }, [setCells]);
+
   useEffect(() => {
     if (init.current) return;
     init.current = true;
@@ -450,14 +456,14 @@ export default function App() {
     </aside>
     <div className="main-shell">
       <header className="topbar"><div className="breadcrumb"><button className="icon-button" title={sidebar ? t("收起侧栏") : t("展开侧栏")} onClick={() => setSidebar(!sidebar)}>{sidebar ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}</button><span>{t("工作空间")}</span><span className="slash">/</span><strong>{mode === 'notebook' ? 'Notebook' : t("传统计算器面板")}</strong></div><div className={`engine-status ${status}`}><span className="status-dot" />{status === 'connecting' ? t("连接引擎") : status === 'error' ? t("引擎离线") : native ? t("原生核心就绪") : t("符号引擎就绪")}{status === 'error' && <button title={t("重新连接")} onClick={() => { setStatus('connecting'); api.connect().then(h => { setNative(h.native); setStatus('ready'); }).catch(e => { setStatus('error'); toast(String(e)); }); }}><RotateCcw size={14} /></button>}</div></header>
-      {mode === 'notebook' ? <>
+      {mode === 'notebook' ? <div className="notebook-workspace"><div className="notebook-document">
         <div className="notebook-header"><div className="document-title"><div className="document-icon"><BookOpen size={22} /></div><div><input aria-label={t("Notebook 名称")} value={title} maxLength={100} onChange={e => setTitle(e.target.value)} /></div></div><div className="document-actions"><button className="subtle-button" title={t("保存")} onClick={() => void save()}><Save size={16} /><span>{t("保存")}</span></button><button className="subtle-button" title={t("另存为")} onClick={() => void save(true)}><SaveAll size={16} /><span>{t("另存为")}</span></button></div></div>
-        <div className="toolbar"><div className="toolbar-group"><button className="primary-button" onClick={() => void runAll()} disabled={!!busy || status !== 'ready'}><Play size={15} fill="currentColor" /><span>{t("全部运行")}</span></button><button className="icon-button" title={t("停止计算")} disabled={!busy} onClick={() => void stop()}><Square size={16} /></button><button className="icon-button" title={t("重启会话")} disabled={!!busy || status !== 'ready'} onClick={() => void restart()}><RotateCcw size={16} /></button><span className="toolbar-separator" /><button className="subtle-button" onClick={() => addCell()}><Sigma size={17} /><span>{t("计算单元")}</span></button><button className="subtle-button" onClick={() => addCell('', 'markdown')}><BookOpen size={16} /><span>{t("文字单元")}</span></button></div><div className="notebook-controls"><button className="zoom-reset subtle-button" title={t("恢复 100%")} onClick={() => setZoom(100)}>{zoom}%</button><span className="cell-count">{cells.length} {t('个单元')}</span></div></div>
+        <div className="toolbar"><div className="toolbar-group"><button className="primary-button" onClick={() => void runAll()} disabled={!!busy || status !== 'ready'}><Play size={15} fill="currentColor" /><span>{t("全部运行")}</span></button><button className="icon-button" title={t("停止计算")} disabled={!busy} onClick={() => void stop()}><Square size={16} /></button><button className="icon-button" title={t("重启会话")} disabled={!!busy || status !== 'ready'} onClick={() => void restart()}><RotateCcw size={16} /></button><button className="icon-button" title={t('清空全部输出')} disabled={!!busy || !cells.some(cell => cell.result || cell.error || cell.executed)} onClick={clearOutputs}><Eraser size={17} /></button><span className="toolbar-separator" /><button className="subtle-button" onClick={() => addCell()}><Sigma size={17} /><span>{t("计算单元")}</span></button><button className="subtle-button" onClick={() => addCell('', 'markdown')}><BookOpen size={16} /><span>{t("文字单元")}</span></button></div><div className="notebook-controls"><button className="zoom-reset subtle-button" title={t("恢复 100%")} onClick={() => setZoom(100)}>{zoom}%</button><span className="cell-count">{cells.length} {t('个单元')}</span></div></div>
         <main className="notebook" aria-label="Notebook" ref={notebookRef} style={{ zoom: zoom / 100 }}>
           {cells.map((cell, index) => <section id={cell.id} key={cell.id} className={`cell ${activeCell === cell.id ? 'active' : ''} ${busy === cell.id ? 'running' : ''}`}>
             <div className="cell-gutter"><button title={t("运行单元")} aria-label={`${t('运行单元')} ${index + 1}`} onClick={() => void run(cell.id)} disabled={cell.mode === 'markdown' || !!busy || status !== 'ready'}>{busy === cell.id ? <LoaderCircle className="spin" size={17} /> : <Play size={15} />}</button><span>{index + 1}</span></div>
             <div className="cell-body"><div className="cell-header"><span className="input-label">{cell.mode === 'markdown' ? 'Text' : `In[${cell.executed ?? ' '}]:=`}</span><div className="cell-actions"><span className="input-mode">{cell.mode === 'markdown' ? t("文字单元") : t("计算单元")}</span><button title={t("上移单元")} disabled={index === 0 || !!busy} onClick={() => move(cell.id, -1)}><ArrowUp size={14} /></button><button title={t("下移单元")} disabled={index === cells.length - 1 || !!busy} onClick={() => move(cell.id, 1)}><ArrowDown size={14} /></button><button title={t("复制单元")} onClick={() => setCells(p => [...p.slice(0, index + 1), { ...cell, id: crypto.randomUUID(), result: undefined, executed: undefined }, ...p.slice(index + 1)])}><Copy size={14} /></button><button title={t("删除单元")} disabled={!!busy} onClick={() => setCells(p => p.length > 1 ? p.filter(c => c.id !== cell.id).map(c => ({ ...c, stale: !!c.result })) : [makeCell()])}><Trash2 size={14} /></button></div></div>
-              {cell.mode === 'markdown' ? <MarkdownCell value={cell.code} onChange={code => change(cell.id, code)} /> : <Editor cell={cell} onChange={(code, latex) => change(cell.id, code, latex)} onRun={code => void run(cell.id, code)} onFocus={() => setActiveCell(cell.id)} />}
+              {cell.mode === 'markdown' ? <MarkdownCell cellId={cell.id} value={cell.code} onChange={code => change(cell.id, code)} /> : <Editor cell={cell} onChange={(code, latex) => change(cell.id, code, latex)} onRun={code => void run(cell.id, code)} onFocus={() => setActiveCell(cell.id)} />}
               {busy === cell.id && <div className="pending"><LoaderCircle size={14} className="spin" />{t("计算中")}</div>}
               {cell.error && <div className="error-message" role="alert">{cell.error}</div>}
               {cell.result && <div className={`output ${cell.stale ? 'stale' : ''}`}><div className="output-label">Out[{cell.executed ?? ' '}]= {cell.stale && <span>{t("待重新计算")}</span>}</div><Output result={cell.result} onInsert={text => insertOutput(cell.id, text)} /></div>}
@@ -465,7 +471,8 @@ export default function App() {
           </section>)}
           <div className="structure-history"><button className="icon-button" title={t('撤销单元操作')} disabled={!!busy || !workspace.canUndo} onClick={() => workspace.navigateHistory('undo')}><Undo2 size={17}/></button><button className="icon-button" title={t('重做单元操作')} disabled={!!busy || !workspace.canRedo} onClick={() => workspace.navigateHistory('redo')}><Redo2 size={17}/></button><button className="add-cell" onClick={() => addCell()} title={t("添加计算单元")}><Plus size={18} /></button></div>
         </main>
-      </> : <CalculatorView ready={status === 'ready'} digits={digits} toast={toast} onBusyChange={setCalculatorBusy} />}
+        </div><NotebookContents cells={cells} notebookId={workspace.current.id} onNavigate={setActiveCell} />
+      </div> : <CalculatorView ready={status === 'ready'} digits={digits} toast={toast} onBusyChange={setCalculatorBusy} />}
       <footer className="statusbar"><span><span className="tiny-dot" />{t("本地计算")}</span><span>{busy || calculatorBusy ? t("计算中") : t("就绪")}</span><span className="statusbar-right">{t(mode === 'notebook' ? 'Notebook' : 'Calculator')}<span>UTF-8</span></span></footer>
     </div>
     {library && <aside className="library-panel"><div className="panel-heading"><strong>{t("计算示例")}</strong><button title={t("关闭示例")} className="icon-button" onClick={() => setLibrary(false)}><X size={17} /></button></div><div className="example-group">{sortedExampleNotebooks.map(example => <button key={example.title} disabled={!!busy || status !== 'ready'} onClick={() => openNotebookExample(example)}><span>{t(example.title)}</span><BookOpen size={14} /></button>)}</div>{[...new Set(libraryExamples.map(e => e.group))].map(group => <div key={group} className="example-group"><h3>{t(group)}</h3>{libraryExamples.filter(e => e.group === group).map(example => <button key={example.title} onClick={() => { if (busyRef.current || status !== 'ready') return; const previous = lastExample.current[example.title]; const choices = example.codes.map((_, i) => i).filter(i => example.codes.length === 1 || i !== previous); const selected = choices[Math.floor(Math.random() * choices.length)]; lastExample.current[example.title] = selected; let code = example.codes[selected]; if (example.title === '显式数值计算') { code = numericalExample(lastNumerical.current); lastNumerical.current = code; } addCell(code); if (innerWidth < 1100) setLibrary(false); }}><span>{t(example.title)}</span><Plus size={14} /></button>)}</div>)}</aside>}

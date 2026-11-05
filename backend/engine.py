@@ -191,6 +191,8 @@ class Engine:
                 if isinstance(b, list):b = np.asarray(b, dtype=float)
                 return operations[value](a, b)
             if value in ('+', '-', '*', '/', '^') and (isinstance(a, list) or isinstance(b, list)):
+                if isinstance(a, s.MatrixBase): a = a.tolist()
+                if isinstance(b, s.MatrixBase): b = b.tolist()
                 def threaded(left, right):
                     if isinstance(left, list) and isinstance(right, list):
                         if len(left) != len(right):
@@ -344,6 +346,13 @@ class Engine:
             return self.graphics(nodes)
         if name == 'Table':
             return table(self, nodes)
+        if name in ('Sum', 'Product'):
+            def indexed(node):
+                return (node.kind == 'call' and node.args[0].kind == 'symbol'
+                        and node.args[0].value in ('Part', 'If')) or any(indexed(child) for child in node.args)
+            if nodes and indexed(nodes[0]):
+                from .iteration import finite_aggregate
+                return finite_aggregate(self, name, nodes)
         if name == 'If':
             if len(nodes) not in (2, 3):
                 raise InputError('If expects a condition, a true branch and an optional false branch')
@@ -404,6 +413,13 @@ class Engine:
             return statistics.dispatch(name, args)
         if name in ('Flatten', 'IntegerQ', 'Mod', 'Accumulate', 'Count', 'Permutations', 'Intersection'):
             return list_call(name, args)
+        if name in ('MatrixForm', 'TableForm'):
+            if len(args) != 1 or not isinstance(args[0], (list, s.MatrixBase)):
+                raise InputError(f'{name} expects one rectangular list or matrix')
+            try:
+                return s.Matrix(args[0])
+            except (ValueError, TypeError):
+                raise InputError(f'{name} expects a rectangular list with scalar entries') from None
         if name == 'Join':
             if any(not isinstance(value, list) for value in args):
                 raise InputError('Join expects lists')
