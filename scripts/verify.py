@@ -48,6 +48,8 @@ def main():
                 status = 'timeout'
         records.append({'command': command, 'exit_code': status, 'seconds': round(time.perf_counter()-start, 3)})
         print(f'{args.tier} check {index+1}: {status}', flush=True)
+        if status != 0:
+            print((args.output/f'{args.tier}-{index}.log').read_text(encoding='utf-8', errors='replace'), flush=True)
     result = {'tier': args.tier, 'passed': all(item['exit_code'] == 0 for item in records), 'checks': records}
     (args.output/f'{args.tier}.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     return 0 if result['passed'] else 1
