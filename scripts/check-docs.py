@@ -7,6 +7,7 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 CURRENT = [
+    'AGENTS.md', 'AI-CONTROL.md', 'API.md', 'docs/AGENT-RECIPES.md',
     'README.md', 'README.zh-CN.md', 'CONTRIBUTING.md', 'SECURITY.md',
     'docs/README.md', 'docs/GETTING-STARTED.md', 'docs/GETTING-STARTED.en.md', 'docs/USER-GUIDE.md',
     'docs/INSTALLATION.md', 'docs/EXAMPLES.md', 'docs/TROUBLESHOOTING.md',
@@ -45,13 +46,20 @@ def main():
         from backend.native import kernel
         kernel.configure_threads(8)
         count = 0
-        for name in ('README.md', 'docs/GETTING-STARTED.md', 'docs/GETTING-STARTED.en.md', 'docs/USER-GUIDE.md'):
+        for name in ('README.md', 'docs/GETTING-STARTED.md', 'docs/GETTING-STARTED.en.md', 'docs/USER-GUIDE.md', 'docs/AGENT-RECIPES.md'):
             engine = Engine()
             for index, code in enumerate(re.findall(r'```wolfram\s*\n(.*?)```', (ROOT / name).read_text(encoding='utf-8'), re.S), 1):
                 try:
+                    if name == 'docs/AGENT-RECIPES.md':
+                        engine = Engine()
                     result = engine.execute(code)
                     if not result:
                         raise ValueError('Missing result')
+                    if name == 'docs/AGENT-RECIPES.md':
+                        def incomplete(value):
+                            return value.get('unresolved', False) or any(incomplete(item) for item in value.get('items', []))
+                        if incomplete(result):
+                            raise ValueError('Agent recipe contains an unresolved result')
                     count += 1
                     print(f'  OK {name}, block {index}: {result["kind"]}')
                 except Exception as exc:

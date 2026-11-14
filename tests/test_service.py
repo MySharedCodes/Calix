@@ -37,6 +37,52 @@ def test_service_auth_and_origin():
         assert preflight.headers["access-control-allow-origin"] == "http://tauri.localhost"
 
 
+def test_startup_prepares_one_reusable_worker_without_session_state():
+    app = create_app('warmup-test')
+    with TestClient(app) as client:
+        assert len(app.state.pool.entries) == 1
+        process, _, busy = app.state.pool.entries[0]
+        assert process.is_alive() and not busy
+        assert app.state.sessions == {}
+        result = client.post('/api/evaluate', headers={'X-Calix-Token': 'warmup-test'},
+                             json={'session': 'first', 'code': '1+1'}).json()
+        assert result['ok'] and result['result']['text'] == '2'
+        assert app.state.pool.entries[0][0].pid == process.pid
+        # The service transports opaque state instead of importing its libraries.
+        assert isinstance(app.state.sessions['first'].state[0], bytes)
+    assert not process.is_alive()
+
+
+def test_scalar_worker_does_not_import_unit_registry():
+    import subprocess
+    import sys
+    result = subprocess.run([sys.executable, '-c',
+        'from backend.engine import Engine; import sys; '
+        'e=Engine(); assert e.execute("Sin[Pi/2]+1")["text"] == "2"; '
+        'assert "pint" not in sys.modules; assert "backend.units" not in sys.modules; '
+        'assert e.execute(\'UnitConvert[1[m],"cm"]\')["text"] == "100[cm]"'],
+        capture_output=True, text=True, timeout=30)
+    assert result.returncode == 0, result.stderr
+
+
+def test_unit_state_moves_to_a_fresh_worker_without_initializing_http_process():
+    from backend.service import WorkerPool
+    pool = WorkerPool(2)
+    session = Session(pool)
+    held = None
+    try:
+        assert session.run('q=3[m];a=41', 'setup')['ok']
+        held = pool.acquire(time.monotonic() + 5)
+        result = session.run('UnitConvert[q,"cm"]', 'migrated')
+        assert result['ok'] and result['result']['text'] == '300[cm]'
+        assert len(pool.entries) == 2
+        assert session.run('a+1', 'variables')['result']['text'] == '42'
+    finally:
+        if held is not None:
+            pool.release(held)
+        pool.close()
+
+
 def test_session_persistence_and_reset():
     with TestClient(create_app("test-token")) as client:
         headers = {"x-calix-token": "test-token"}

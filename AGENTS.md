@@ -1,39 +1,48 @@
-# Calix: Fast Calculation Entry
+# Calix: calculate first
 
-Use `D:/Calix/App/calix-cli.exe` (or `./calix-cli.exe` in this directory).
-Input is a supported Wolfram-language subset, not Python. For routine tasks,
-this file is enough; consult AI-CONTROL.md or API.md only when needed.
+Calix accepts a **Wolfram-language subset**, not Python or full Mathematica.
+Use `calix-cli.exe` beside this file; pass its absolute path when working elsewhere.
+On this workstation the installed copy is `D:/Calix/App/calix-cli.exe`.
+Save task files in your task directory, not the installation or source tree.
 
-Write ALL related expressions to one UTF-8 `problem.wl`, one result per line.
-Use `;` to suppress intermediate definitions. Then make ONE call:
+## Default: one file, one call
+
+Write related expressions to a UTF-8 `problem.wl`, one result per line. End
+intermediate definitions with `;`. Choose a new session name per independent task:
 
 ```powershell
-& 'D:\Calix\App\calix-cli.exe' eval --file problem.wl --output results.json --brief --open-ui
+& 'D:\Calix\App\calix-cli.exe' eval --file problem.wl --session task_001 --brief --output results.json --open-ui
 ```
 
-The command starts the service if needed. Stdout contains compact actual answers;
-the JSON file retains full results. Check exit code and `ok`. Omit `--open-ui`
-when the task requests headless timing. No preliminary status/start/schema call
-is needed. Do not create a notebook unless the task needs separate cells.
+The service starts automatically. No `start`, `status`, `schema`, source-code
+inspection or dependency installation is needed for a normal calculation.
+Stdout contains answers; the file retains full results and plot data.
+Open the UI on the final call only; omit `--open-ui` for headless tasks.
 
-To deliver a notebook, add `--notebook answer.cixnb --title "Problem title"`.
-Calix writes valid UTF-8 and includes actual outputs. Avoid hand-authoring notebook
-JSON. Check it with `calix-cli.exe validate answer.cixnb` before delivery; this
-checks structure and calculation syntax without executing. A valid notebook may
-still require calculations to be rerun; use the official export to retain results.
+| Need | Use |
+| --- | --- |
+| Expressions known in advance | One `eval --file` (up to 40 visible results) |
+| Next step depends on a result | One `pipe --brief`; JSONL `{"id":1,"code":"1+1"}` |
+| Existing notebook with text cells | `run input.cixnb --brief --notebook answer.cixnb --open-ui` |
+| Export calculated inputs/outputs | Add `--notebook answer.cixnb --title "Title"` |
+| Open saved results without recalculating | `open-ui --notebook answer.cixnb` |
 
-Syntax: `Sum[k^6,{k,1,500}]`, `Integrate[x^4 Exp[-3 x^2],{x,-Infinity,Infinity}]`,
-`Solve[{x+y==3,x*y==2},{x,y}]`, `Det[m]`, `Inverse[m]`,
-`DSolve[{x''[t]+3 x'[t]+2 x[t]==Exp[-t],x[0]==0,x'[0]==1},x[t],t]`,
-`UnitConvert[650[gr],"g"]`. `gr` is grain. Units use `890[m/s]`.
-For equation systems use `Solve[equations, variables]`; explicit domain arguments
-on systems are currently unsupported. Check that returned solutions meet the
-problem's real/integer constraints.
+## Avoid retries
 
-Use the same `--session NAME` for dependent calls. For interactive sequences,
-`pipe --brief` accepts JSONL `{"id":1,"code":"1+1"}` and flushes one response
-per line without restarting the client. Add `--open-ui` to open results at EOF.
-Desktop handoff shows saved outputs in a fresh kernel; rerun definitions to continue.
-Save artifacts in the task directory. Do not edit application source or user
-notebooks for calculations. Report unsupported expressions and errors explicitly.
-Never print or share the private local API token.
+- Calls use `Sin[x]`, lists `{x,y}`, powers `x^2`, equations `==`, assignment `=`.
+  Use `Pi`, `I`, `Infinity`; use `Dot[a,b]` for matrix multiplication.
+- No `f[x_]:=...`, patterns or packages. Use `f=x^2; ReplaceAll[f,x->3]`.
+  `FindRoot[f,{x,a,b}]` needs a real sign-changing **bracket**, not one guess.
+- Keep exact inputs as fractions; use `N[expr,30]` when decimals are needed.
+  Units: `890[m/s]`; `gr` is grain, `g` is gram.
+- Check exit code AND `ok`. `unresolved:true` means evaluation is incomplete;
+  a symbolic result with remaining variables is not automatically an error.
+  See [tested recipes](docs/AGENT-RECIPES.md) for task syntax and recovery.
+- Reuse `--session` only for dependent calls. Timeout/cancel clears its state.
+  GUI handoff opens saved outputs in a fresh kernel; rerun definitions to continue.
+
+Prefer official notebook export. For text/heading cells, see the short authoring
+recipe in [AI-CONTROL.md](AI-CONTROL.md). `validate answer.cixnb` checks structure
+and syntax, not answers. Do not overwrite user inputs or edit application source
+to solve a calculation. Never print/share the local API token.
+Read [API.md](API.md) only for HTTP integration or detailed command semantics.

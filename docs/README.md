@@ -21,6 +21,7 @@
 - [PDE module 与建模限制](PDE.md)
 - [CPU 加速、Workers 与执行信息](CPU-ACCELERATION.md)
 - [AI 操作指南](../AI-CONTROL.md)
+- [Agent 按题型速查与错误恢复](AGENT-RECIPES.md)
 - [CLI/API 参考](../API.md)
 
 ## 开发与发布

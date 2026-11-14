@@ -24,6 +24,25 @@ struct Backend {
 enum Startup { Pending, Ready(Backend), Failed(String) }
 struct BackendSlot(Arc<Mutex<Startup>>);
 
+#[tauri::command]
+fn open_project_repository(url: String) -> Result<(), String> {
+    let path = url.strip_prefix("https://github.com/").ok_or("Invalid GitHub URL")?;
+    let parts: Vec<_> = path.split('/').collect();
+    if parts.len() != 2 || parts.iter().any(|part| part.is_empty() || *part == "." || *part == ".."
+        || !part.bytes().all(|c| c.is_ascii_alphanumeric() || b"_.-".contains(&c))) {
+        return Err("Invalid GitHub repository path".into());
+    }
+    #[cfg(windows)]
+    {
+        Command::new("explorer.exe").arg(&url).creation_flags(0x08000000)
+            .stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null())
+            .spawn().map_err(|e| e.to_string())?;
+        Ok(())
+    }
+    #[cfg(not(windows))]
+    { Err("Opening the browser is supported on Windows".into()) }
+}
+
 const PREFERENCE_KEYS: [&str; 5] = ["calix-digits","calix-workers","calix-language","calix-theme","calix-notebook-zoom"];
 
 fn preference_directory(app: &tauri::AppHandle) -> Result<PathBuf,String> {
@@ -257,7 +276,7 @@ fn main() {
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![connection_info, startup_notebook, read_preferences, write_preferences, write_recovery, list_recovery, read_recovery, list_file_versions, read_file_version, read_notebook, write_notebook, delete_notebook, reveal_notebook])
+        .invoke_handler(tauri::generate_handler![connection_info, startup_notebook, read_preferences, write_preferences, write_recovery, list_recovery, read_recovery, list_file_versions, read_file_version, read_notebook, write_notebook, delete_notebook, reveal_notebook, open_project_repository])
         .build(tauri::generate_context!())
         .expect("Calix desktop initialization failed");
     app.run(|handle, event| {

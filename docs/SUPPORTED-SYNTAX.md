@@ -47,6 +47,10 @@ Exact and high-precision symbolic operations use SymPy/mpmath. Supported precisi
 
 Symbolic function families include elementary trigonometric, exponential and logarithmic functions; Gamma/Beta; Erf/Erfc; Bessel J/Y/I/K; Airy Ai/Bi; elliptic K/E; Zeta/PolyLog; and hypergeometric 0F1/1F1/2F1/PFQ. Simplification is delegated to the installed engine, so not every identity or analytic continuation is reduced automatically. `FullSimplify` currently shares the `Simplify` implementation.
 
+Finite `Sum` / `Product` expressions containing `Part` or `If` use bounded iteration, so indexed scalar data can be aggregated, for example `Block[{a,i},a={2,3,5};Sum[Part[a,i]^2,{i,1,3}]]`. This path supports the same finite iterators and 100,000-evaluation limit as `Table`, and restores iterator variables. Infinite indexed aggregates and list-valued terms on this path are unsupported; ordinary symbolic sums/products retain the symbolic engine path.
+
+`TableForm[rectangularList]` and `MatrixForm[rectangularList]` display scalar entries as a typeset matrix, with rows retained vertically. Their current implementation returns an exact matrix; it does not support the full Wolfram formatting options. Keep the original list variable for further list operations.
+
 ## Units
 
 ```text

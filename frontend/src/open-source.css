@@ -1,0 +1,8 @@
+.settings-modal{max-height:calc(100dvh - 40px);overflow-y:auto}
+.open-source-card{margin-top:12px;padding:16px;border:1px solid var(--border);border-radius:6px;background:var(--soft)}
+.open-source-title{display:flex;align-items:center;gap:8px;color:var(--accent);font-size:14px;font-weight:600}
+.open-source-card p{margin:10px 0 14px;color:var(--text-muted);font-size:12px;line-height:1.7}
+.open-source-card a{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:8px 12px;border-radius:5px;background:var(--accent);color:var(--surface);font-size:12px;font-weight:600;text-decoration:none}
+.open-source-card a:hover{filter:brightness(.92)}
+.open-source-card a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.open-source-card a[aria-disabled=true]{opacity:.65;cursor:wait}

@@ -1,38 +1,15 @@
 # Calix 0.1.28
 
-## Notebook Recovery
+首次公开后的功能更新合并记录。
 
-Desktop workspaces now have a separate disk recovery copy, written through a
-flushed temporary file before replacement. Up to 20 previous workspace revisions
-are retained, normally at one-minute intervals and at structural checkpoints.
-Falling back to disk no longer depends on an intact WebView local-storage copy.
-Recovery history opens a selected notebook as a new document; the original is kept.
+- 增强文字单元编辑，支持字号、样式、标题、公式和 Esc 特殊字符输入。
+- 新增可搜索的笔记目录，改善长笔记阅读、定位和窄窗口布局。
+- 增强 AI 操控方便性，完善计算速查、笔记交付和错误恢复说明。
+- 改善首次计算速度，以及单位、矩阵和求和求积的计算体验。
+- 增加清空输出、笔记恢复历史和单元操作撤销，方便整理与恢复计算过程。
+- 窗口标题随界面语言切换，完善开源项目信息入口。
+- 完善使用帮助、自动验证和开发文档。
 
-Saving over a notebook preserves its previous content in the adjacent
-`.calix-history/<filename>/` directory. Saved-file versions are available in the
-recovery window when that notebook is active. Backups are local and unencrypted.
-They do not replace an external backup or guarantee survival of disk failure.
-
-Cell insertion, deletion, duplication and movement support 20 levels of structural
-undo/redo. Restored results are stale; kernel definitions are not rolled back.
-Text editing retains its own editor undo history.
-
-## Calculation Reliability
-
-Numerical ODE interpolants now accept direct calls such as `u[0.5]`; these were
-previously misclassified as unit suffixes. Independent checks cover rational
-arithmetic, polynomial derivatives, quadrature, root residuals, oscillator energy,
-statistics, affine units and complex branches. Output metadata distinguishes
-unevaluated operations and symbolic functions from evaluated expressions.
-
-## Maintenance
-
-The source has a local Git baseline. Windows verification workflows and bounded
-core/numerical/example test tiers retain machine-readable results. Native setup
-can download versioned Boost and checksum-verified Eigen archives. Standard Rust
-installations are supported by desktop packaging scripts. Build records carry
-the source commit, dirty status, source digest and dependency-lock hashes.
-
-The application license and repository URL remain undecided. Windows signing,
-clean-machine installation qualification and AVX-512/AMX execution on matching
-hardware remain separate release requirements.
+Calix 自有源码采用 GPL-3.0-only，公开仓库为
+[MySharedCodes/Calix](https://github.com/MySharedCodes/Calix)。本次为源码更新；
+公开二进制发行与代码签名状态见[发行说明](LICENSING.md)。

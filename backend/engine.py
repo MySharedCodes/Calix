@@ -5,12 +5,11 @@ import time
 from functools import reduce
 import operator
 import builtins
-import pint
 import sympy as s
 from sympy.core.function import AppliedUndef
 from .presentation import expression_latex, expression_text
 from .syntax import InputError, Node, parse
-from .units import quantity, unit_text, dimensionless, format_quantity, simplify_quantity, unit_label
+from .unit_support import is_quantity, quantity, unit_text, dimensionless, format_quantity, simplify_quantity, unit_label
 from .native import kernel, NativeUnsupported
 from . import statistics
 from .interpolation import SampledFunction, SampledDerivative, interpolate, interpolate_derivative
@@ -91,7 +90,7 @@ class Engine:
             text, latex = result.summary()
             text = next((key for key,value in self.environment.items() if value is result), text)
             return {'kind':'expression','text':text,'latex':latex,'elapsed_ms':round(elapsed,2),'engine':self.route}
-        if isinstance(result, pint.Quantity):
+        if is_quantity(result):
             text, latex = format_quantity(result)
         elif isinstance(result, list):
             if any(isinstance(item,dict) and item.get('kind') in ('plot','animation','labeled','group') for item in result):
@@ -178,7 +177,7 @@ class Engine:
             if value=='==' and hasattr(a,'equation') and callable(a.equation):return a.equation(b)
             if (type(a).__module__ or '').startswith(('numpy','scipy')) and isinstance(b,s.Number):b=float(b)
             if (type(b).__module__ or '').startswith(('numpy','scipy')) and isinstance(a,s.Number):a=float(a)
-            if value in ('==','!=','<','>','<=','>=') and (isinstance(a,pint.Quantity) or isinstance(b,pint.Quantity)):
+            if value in ('==','!=','<','>','<=','>=') and (is_quantity(a) or is_quantity(b)):
                 difference = a-b
                 a,b = s.sympify(difference.magnitude), s.Integer(0)
             operations = {"+": operator.add, "-": operator.sub, "*": operator.mul,
@@ -191,6 +190,8 @@ class Engine:
                 if isinstance(b, list):b = np.asarray(b, dtype=float)
                 return operations[value](a, b)
             if value in ('+', '-', '*', '/', '^') and (isinstance(a, list) or isinstance(b, list)):
+                if isinstance(a, s.MatrixBase): a = a.tolist()
+                if isinstance(b, s.MatrixBase): b = b.tolist()
                 def threaded(left, right):
                     if isinstance(left, list) and isinstance(right, list):
                         if len(left) != len(right):
@@ -201,7 +202,7 @@ class Engine:
                     return operations[value](left, right)
                 return threaded(a, b)
             result = operations[value](a, b)
-            return simplify_quantity(result) if isinstance(result, pint.Quantity) else result
+            return simplify_quantity(result) if is_quantity(result) else result
         if kind == "call":
             target, *arguments = children
             if target.kind=='symbol' and target.value in self.environment and callable(self.environment[target.value]):
@@ -230,7 +231,7 @@ class Engine:
                 if len(arguments) != 1:
                     raise InputError('An interpolating function takes one argument')
                 return self.environment[name]._at(self.evaluate(arguments[0]))
-            if len(arguments) == 1 and ((name in self.environment and isinstance(self.environment[name], (s.Expr, pint.Quantity, list))) or (name[0].islower() and arguments[0].kind == 'string')):
+            if len(arguments) == 1 and ((name in self.environment and (isinstance(self.environment[name], (s.Expr, list)) or is_quantity(self.environment[name]))) or (name[0].islower() and arguments[0].kind == 'string')):
                 unit = unit_text(arguments[0])
                 def attach(value):
                     return [attach(item) for item in value] if isinstance(value, list) else simplify_quantity(quantity(value, unit))
@@ -344,6 +345,13 @@ class Engine:
             return self.graphics(nodes)
         if name == 'Table':
             return table(self, nodes)
+        if name in ('Sum', 'Product'):
+            def indexed(node):
+                return (node.kind == 'call' and node.args[0].kind == 'symbol'
+                        and node.args[0].value in ('Part', 'If')) or any(indexed(child) for child in node.args)
+            if nodes and indexed(nodes[0]):
+                from .iteration import finite_aggregate
+                return finite_aggregate(self, name, nodes)
         if name == 'If':
             if len(nodes) not in (2, 3):
                 raise InputError('If expects a condition, a true branch and an optional false branch')
@@ -404,6 +412,13 @@ class Engine:
             return statistics.dispatch(name, args)
         if name in ('Flatten', 'IntegerQ', 'Mod', 'Accumulate', 'Count', 'Permutations', 'Intersection'):
             return list_call(name, args)
+        if name in ('MatrixForm', 'TableForm'):
+            if len(args) != 1 or not isinstance(args[0], (list, s.MatrixBase)):
+                raise InputError(f'{name} expects one rectangular list or matrix')
+            try:
+                return s.Matrix(args[0])
+            except (ValueError, TypeError):
+                raise InputError(f'{name} expects a rectangular list with scalar entries') from None
         if name == 'Join':
             if any(not isinstance(value, list) for value in args):
                 raise InputError('Join expects lists')
@@ -476,7 +491,7 @@ class Engine:
             digits = int(args[1]) if len(args) > 1 else 16
             if digits < 2 or digits > 1000:
                 raise InputError("Precision must be between 2 and 1000 digits")
-            if isinstance(args[0], pint.Quantity):
+            if is_quantity(args[0]):
                 return quantity(s.N(args[0].magnitude, digits), args[0].units)
             def approximate(value):
                 return [approximate(item) for item in value] if isinstance(value, list) else s.N(value, digits)
@@ -561,11 +576,11 @@ class Engine:
             integration_unit=None
             if len(limits)==1 and isinstance(limits[0],tuple) and len(limits[0])==3:
                 var,lower,upper=limits[0]
-                integration_unit=next((a.units for a in (lower,upper) if isinstance(a,pint.Quantity)),None)
+                integration_unit=next((a.units for a in (lower,upper) if is_quantity(a)),None)
                 if integration_unit is not None:
-                    limits=[(var,*[s.sympify(a.to(integration_unit).magnitude) if isinstance(a,pint.Quantity) else a for a in (lower,upper)])]
+                    limits=[(var,*[s.sympify(a.to(integration_unit).magnitude) if is_quantity(a) else a for a in (lower,upper)])]
             def integral(expr):
-                if isinstance(expr,pint.Quantity):
+                if is_quantity(expr):
                     return simplify_quantity(quantity(integral(expr.magnitude),expr.units*(integration_unit or quantity(1,'').units)))
                 if isinstance(expr, SampledFunction):
                     if len(limits) != 1 or not isinstance(limits[0], tuple) or len(limits[0]) != 3:
@@ -740,7 +755,7 @@ class Engine:
         if name == "Quantity":
             return simplify_quantity(quantity(*args))
         if name == "UnitConvert":
-            if not isinstance(args[0], pint.Quantity) or not isinstance(args[1], str):
+            if not is_quantity(args[0]) or not isinstance(args[1], str):
                 raise InputError('Use UnitConvert[3[m], "cm"]')
             return args[0].to(quantity(1, args[1]).units)
         if name == "UnitSimplify":
@@ -748,7 +763,7 @@ class Engine:
                 raise InputError('Use UnitSimplify["kg*m/s^2"] or UnitSimplify[quantity]')
             return simplify_quantity(quantity(s.Integer(1), args[0]) if isinstance(args[0], str) else args[0])
         if name == "Magnitude":
-            return args[0].magnitude if isinstance(args[0], pint.Quantity) else args[0]
+            return args[0].magnitude if is_quantity(args[0]) else args[0]
         if name == "ReplaceAll":
             if isinstance(args[1],list) and args[1] and all(isinstance(rule,dict) for rule in args[1]):
                 def apply(value,mapping):
@@ -841,8 +856,8 @@ class Engine:
             interval = plot_node.args[2]
             parameter, lower, upper = interval.args
             bounds = [self.evaluate(bound) for bound in (lower, upper)]
-            unit = next((b.units for b in bounds if isinstance(b, pint.Quantity)), None)
-            lo, hi = [as_float(b.to(unit).magnitude) if isinstance(b, pint.Quantity) else as_float(b) for b in bounds]
+            unit = next((b.units for b in bounds if is_quantity(b)), None)
+            lo, hi = [as_float(b.to(unit).magnitude) if is_quantity(b) else as_float(b) for b in bounds]
             count = len(result["traces"][0]["x"])
             values = [lo + (hi - lo) * i / (count - 1) for i in range(count)]
             return {"kind": "animation", "animation_type": "trajectory", "plot": result,
@@ -927,8 +942,8 @@ class Engine:
                 options[node.args[0].value] = self.evaluate(node.args[1])
             elif node.kind == "list" and len(node.args) == 3 and node.args[0].kind == "symbol":
                 bounds = [self.evaluate(v) for v in node.args[1:]]
-                unit = next((b.units for b in bounds if isinstance(b, pint.Quantity)), None)
-                numeric = [as_float(b.to(unit).magnitude) if isinstance(b, pint.Quantity) else as_float(b) for b in bounds]
+                unit = next((b.units for b in bounds if is_quantity(b)), None)
+                numeric = [as_float(b.to(unit).magnitude) if is_quantity(b) else as_float(b) for b in bounds]
                 range_units.append(unit)
                 ranges.append((symbol(node.args[0].value), *numeric))
             else:
@@ -975,8 +990,8 @@ class Engine:
                 dim = 3 if name == "ParametricPlot3D" else 2
                 if not isinstance(expression, list) or len(expression) != dim:
                     raise InputError(f"{name} expects {dim} coordinate expressions")
-                labels = [axis_label(label, e.units if isinstance(e, pint.Quantity) else None) for label, e in zip("xyz", expression)]
-                expression = [s.sympify(e.magnitude) if isinstance(e, pint.Quantity) else e for e in expression]
+                labels = [axis_label(label, e.units if is_quantity(e) else None) for label, e in zip("xyz", expression)]
+                expression = [s.sympify(e.magnitude) if is_quantity(e) else e for e in expression]
                 coords = [self.sample(e, variables, [xs]) for e in expression]
                 trace = {axis: values for axis, values in zip("xyz", coords)}
                 return {**base, "plot_type": "curve3d" if dim == 3 else "curve", "traces": [{**trace, "name": str(expression)}], "axes": labels}
@@ -984,9 +999,9 @@ class Engine:
             legends = options.get('PlotLegends')
             if legends is not None and (not isinstance(legends, list) or len(legends) != len(expressions) or any(not isinstance(label, str) or len(label) > 100 for label in legends)):
                 raise InputError('PlotLegends requires one text label per curve (up to 100 characters each)')
-            yunit = next((e.units for e in expressions if isinstance(e, pint.Quantity)), None)
+            yunit = next((e.units for e in expressions if is_quantity(e)), None)
             if yunit is not None:
-                expressions = [s.sympify(e.to(yunit).magnitude) if isinstance(e, pint.Quantity) else dimensionless(quantity(e, "").to(yunit)) for e in expressions]
+                expressions = [s.sympify(e.to(yunit).magnitude) if is_quantity(e) else dimensionless(quantity(e, "").to(yunit)) for e in expressions]
                 base["axes"] = [labels[0], axis_label("y", yunit)]
             traces = []
             for curve_index, expr in enumerate(expressions):
@@ -1012,12 +1027,12 @@ class Engine:
         if name == "ParametricPlot3D":
             if not isinstance(expression, list) or len(expression) != 3:
                 raise InputError("A parametric surface needs three coordinate expressions")
-            labels = [axis_label(label, e.units if isinstance(e, pint.Quantity) else None) for label, e in zip("xyz", expression)]
-            expression = [s.sympify(e.magnitude) if isinstance(e, pint.Quantity) else e for e in expression]
+            labels = [axis_label(label, e.units if is_quantity(e) else None) for label, e in zip("xyz", expression)]
+            expression = [s.sympify(e.magnitude) if is_quantity(e) else e for e in expression]
             coords = [self.sample(e, variables, [xx, yy]) for e in expression]
             return {**base, "plot_type": "parametric_surface", "size": count,
                     "coordinates": coords, "axes": labels}
-        if isinstance(expression, pint.Quantity):
+        if is_quantity(expression):
             base["axes"] = [*labels, axis_label("z", expression.units)]
             expression = s.sympify(expression.magnitude)
         values = self.sample(expression, variables, [xx, yy])

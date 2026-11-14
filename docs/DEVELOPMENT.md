@@ -84,6 +84,13 @@ npm.cmd run dev
 
 ## 验证
 
+首次计算性能使用 `.\.venv\Scripts\python.exe scripts/benchmark-startup.py` 测量。
+增加 `--executable App/backend/calix-service.exe` 测量安装版。脚本分别记录握手、
+引擎就绪、首个 `1+1` 请求和启动到首个答案的总耗时；不能只报告预热后的请求时间。
+每次启动全新的服务进程，默认三轮、8 Workers，不清空操作系统文件缓存。
+服务就绪前仅预热一个可复用计算进程；单位库按需加载，会话状态在计算进程中序列化，
+HTTP 主进程只转发本机计算进程生成的状态，不接收外部 pickle 文件。
+
 ```powershell
 npm.cmd run build
 .\.venv\Scripts\python.exe scripts/check-docs.py

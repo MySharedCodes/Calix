@@ -21,6 +21,7 @@ for trial in (1,2):
     target.mkdir(exist_ok=False)
     for name in ('AGENTS.md','AI-CONTROL.md','API.md'):
         shutil.copy2(root/'App'/name,target/name)
+    shutil.copytree(root/'App/docs',target/'docs')
     task=previous['PROBLEMS']
     (target/'task.txt').write_text(task,encoding='utf8')
     start_time=time.strftime('%Y-%m-%dT%H:%M:%S%z')

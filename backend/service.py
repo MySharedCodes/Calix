@@ -4,6 +4,7 @@ import asyncio
 import hmac
 import multiprocessing as mp
 import os
+import pickle
 from pathlib import Path
 import secrets
 import threading
@@ -23,6 +24,7 @@ from backend.hardware import physical_cores, default_workers
 def worker(connection):
     from backend.engine import Engine
     engine = Engine()
+    default_assumptions = engine.assumptions
     while True:
         try:
             command = connection.recv()
@@ -36,13 +38,28 @@ def worker(connection):
             threads=command.get('threads',1)
             affinity=limit_process_cores(threads)
             kernel.configure_threads(threads)
-            engine.environment, engine.assumptions = command["state"]
+            state = command["state"]
+            if state is None:
+                engine.environment.clear()
+                engine.assumptions = default_assumptions
+            else:
+                payload, uses_units = state
+                if uses_units:
+                    from backend import units  # Register Pint before unpickling quantities.
+                engine.environment, engine.assumptions = pickle.loads(payload)
             result = engine.execute(command["code"])
             result['execution']['affinity']=affinity
-            connection.send({"ok": True, "result": result, "state": (engine.environment, engine.assumptions)})
+            response = {"ok": True, "result": result}
+            if command.get('runtime_info'):
+                response['runtime_info'] = {'native': kernel.available, 'cpu_features': kernel.cpu_features()}
         except Exception as exc:
             message = str(exc) or type(exc).__name__
-            connection.send({"ok": False, "error": message[:1800], "error_type": type(exc).__name__, "state": (engine.environment, engine.assumptions)})
+            response = {"ok": False, "error": message[:1800], "error_type": type(exc).__name__}
+        # The HTTP process stores opaque state; it need not import symbolic/unit
+        # libraries merely to transfer an isolated notebook between workers.
+        import sys
+        response['state'] = (pickle.dumps((engine.environment, engine.assumptions), protocol=pickle.HIGHEST_PROTOCOL), 'backend.units' in sys.modules)
+        connection.send(response)
 
 
 class WorkerPool:
@@ -50,6 +67,14 @@ class WorkerPool:
         self.maximum = maximum
         self.condition = threading.Condition()
         self.entries = []
+        self.runtime_info = None
+
+    def warmup(self):
+        # Prepare one reusable process, not one heavyweight process per CPU core.
+        # Use the real evaluation path so parsing, printers and native setup are ready.
+        result = Session(self).run('1+1', 'startup-warmup', timeout=30, runtime_info=True)
+        if not result.get('ok') or result['result']['text'] != '2':
+            raise RuntimeError('Calculation worker initialization failed')
 
     def acquire(self, deadline):
         with self.condition:
@@ -113,11 +138,9 @@ class WorkerPool:
 
 class Session:
     def __init__(self, pool=None):
-        import sympy as s
-        from backend import units  # Register the same units before receiving worker state.
         self.pool = pool or WorkerPool(1)
         self.owns_pool = pool is None
-        self.state = ({}, s.true)
+        self.state = None
         self.lock = threading.Lock()
         self.process = None
         self.connection = None
@@ -126,9 +149,8 @@ class Session:
         self.request_id = None
 
     def stop(self):
-        import sympy as s
         self.generation += 1
-        self.state = ({}, s.true)
+        self.state = None
         if self.process is not None:
             if self.process.is_alive():
                 self.process.terminate()
@@ -137,7 +159,7 @@ class Session:
         if self.owns_pool:
             self.pool.close()
 
-    def run(self, code, request_id, timeout=180):
+    def run(self, code, request_id, timeout=180, runtime_info=False):
         if not self.lock.acquire(blocking=False):
             raise HTTPException(409, "This session is busy")
         try:
@@ -150,7 +172,7 @@ class Session:
             connection = self.connection
             if generation != self.generation:
                 raise HTTPException(409, "Calculation cancelled")
-            connection.send({"code": code, "state": self.state,"threads":self.pool.maximum})
+            connection.send({"code": code, "state": self.state,"threads":self.pool.maximum, 'runtime_info': runtime_info})
             while time.monotonic() < deadline:
                 if generation != self.generation:
                     raise HTTPException(409, "Calculation cancelled; session variables were cleared")
@@ -160,6 +182,8 @@ class Session:
                         if generation != self.generation:
                             raise HTTPException(409, "Calculation cancelled")
                         self.state = result.pop("state")
+                        if 'runtime_info' in result:
+                            self.pool.runtime_info = result.pop('runtime_info')
                         self.request_id = None
                         return result
                 except (EOFError, OSError):
@@ -195,10 +219,13 @@ class OpenUI(BaseModel):
 def create_app(token=None, frontend=None, role='desktop'):
     @asynccontextmanager
     async def lifespan(app):
-        yield
-        for session in app.state.sessions.values():
-            session.stop()
-        app.state.pool.close()
+        try:
+            await asyncio.to_thread(app.state.pool.warmup)
+            yield
+        finally:
+            for session in app.state.sessions.values():
+                session.stop()
+            app.state.pool.close()
 
     app = FastAPI(title="Calix local computation service", docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
     app.state.token = token or secrets.token_urlsafe(32)
@@ -221,10 +248,9 @@ def create_app(token=None, frontend=None, role='desktop'):
 
     @app.get("/api/health")
     def health():
-        from backend.native import kernel
         from backend.components import capabilities
-        return {"status": "ok", "version": "0.1.28", "native": kernel.available, "abi": 1, "api_version": 1,
-                "cpu_count": physical_cores(), "logical_cpu_count": os.cpu_count() or 1, "max_workers": app.state.pool.maximum, "components": capabilities(), "cpu_features":kernel.cpu_features()}
+        return {"status": "ok", "version": "0.1.28", **app.state.pool.runtime_info, "abi": 1, "api_version": 1,
+                "cpu_count": physical_cores(), "logical_cpu_count": os.cpu_count() or 1, "max_workers": app.state.pool.maximum, "components": capabilities()}
 
     @app.get('/api/capabilities')
     def api_capabilities():

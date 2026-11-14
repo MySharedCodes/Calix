@@ -6,6 +6,10 @@ symbolic algebra, calculus, equations, units, statistics, plots and numerical
 solvers are available. PDE calculations require the optional PDE module.
 This is not a complete implementation of the Wolfram Language.
 
+For a first calculation, read [AGENTS.md](AGENTS.md) instead of this full
+reference. Use [task recipes](docs/AGENT-RECIPES.md) for supported calling forms
+and [agent workflows](AI-CONTROL.md) for notebook authoring and recovery.
+
 ## Command Line
 
 Run commands from the installation directory in PowerShell. The launcher also
@@ -190,6 +194,7 @@ authenticated OpenAPI schema is at `GET /api/openapi.json`.
 | `POST /api/evaluate` | Evaluate one calculation cell |
 | `POST /api/cancel/{session}` | Stop the calculation and clear the session |
 | `POST /api/settings` | Set `max_workers` |
+| `POST /api/open-ui` | Open the desktop, optionally with a notebook |
 | `POST /api/shutdown` | Gracefully stop a CLI-owned service |
 
 `POST /api/evaluate` accepts `session`, `code`, an optional `request_id`, and

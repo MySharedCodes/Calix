@@ -27,6 +27,7 @@ def execute(route, number):
     if route == 'calix':
         for name in ('AGENTS.md', 'API.md', 'AI-CONTROL.md'):
             shutil.copy2(ROOT / name, folder / name)
+        shutil.copytree(ROOT / 'docs', folder / 'docs')
         # Use the source launcher so this experiment does not depend on an old installed runtime.
         guide = (folder / 'AGENTS.md').read_text(encoding='utf8')
         guide += '\nFor this task, use D:/Calix/calix-cli.exe. Save task artifacts in the current directory.\n'

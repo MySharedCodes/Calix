@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Calix",
+        "title": "Calix:开源、轻量、快捷的符号计算",
         "width": 1280,
         "height": 880,
         "minWidth": 720,
@@ -21,7 +21,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src ipc: http://ipc.localhost http://127.0.0.1:*; worker-src 'self' blob:"
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src ipc: http://ipc.localhost http://127.0.0.1:* https://api.github.com; worker-src 'self' blob:"
     }
   },
   "bundle": {
